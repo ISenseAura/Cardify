@@ -3,7 +3,7 @@ declare var BaseCommands: import('./types/command-parser').BaseLoadedCommands;
 declare var Client: import('./client/client').Client;
 declare var CommandParser: import('./command-parser').CommandParser;
 declare var Commands: import('./types/command-parser').BaseLoadedCommands;
-declare var Config: Partial<typeof import('./config-example')>;
+declare var Config: Partial<typeof import('./config')>;
 declare var Dex: import('./dex').Dex;
 declare var Games: import('./games').Games;
 declare var __reloadInProgress: boolean;

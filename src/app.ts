@@ -164,7 +164,7 @@ export async function reloadModules(username: string, targets: string[], formats
 			} else if (moduleId === 'config') {
 				let oldConfig = global.Config;
 				const configLoader = require(configLoaderPath) as typeof import('./config-loader');
-				const newConfig = configLoader.load(Tools.deepClone(require(modulePath) as typeof import('./config-example')));
+				const newConfig = configLoader.load(Tools.deepClone(require(modulePath) as typeof import('./config')));
 				global.Config = newConfig;
 				global.Client.updateConfigSettings();
 				global.Rooms.updateConfigSettings();
