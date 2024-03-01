@@ -142,6 +142,7 @@ export function load(config: typeof Config): typeof Config {
 	if (config.tournamentPointsShopRibbons) objectKeysToRoomId(config.tournamentPointsShopRibbons);
 	if (config.userHostedTournamentRanks) objectKeysToRoomId(config.userHostedTournamentRanks);
 	if (config.gameCatalogGists) objectKeysToRoomId(config.gameCatalogGists);
+	if (config.roomIntro) objectKeysToRoomId(config.roomIntro);
 
 	return config;
 }

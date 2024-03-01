@@ -243,6 +243,10 @@ export class Room {
 		if (this.searchChallenge) this.searchChallenge.onUserJoinRoom(this, user);
 		if (this.tournament) this.tournament.onUserJoinRoom(this, user);
 		if (this.userHostedGame) this.userHostedGame.onUserJoinRoom(this, user);
+
+		if(Config.roomIntro[this.id]) {
+			this.sayPrivateUhtml(user,"roomintro",Config.roomIntro[this.id])
+		}
 	}
 
 	onUserLeave(user: User): void {

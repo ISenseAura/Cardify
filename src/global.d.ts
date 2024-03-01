@@ -1,4 +1,6 @@
 /* eslint-disable no-var, @typescript-eslint/naming-convention */
+
+
 declare var BaseCommands: import('./types/command-parser').BaseLoadedCommands;
 declare var Client: import('./client/client').Client;
 declare var CommandParser: import('./command-parser').CommandParser;
@@ -14,6 +16,8 @@ declare var tempConfig: boolean;
 declare var Tools: import('./tools').Tools;
 declare var Tournaments: import('./tournaments').Tournaments;
 declare var Users: import('./users').Users;
+
+declare module 'pokemontcgsdk';
 
 declare var _inputFolders: import('./types/root').InputFolders | undefined;
 declare var _outputFilepaths: string[] | undefined;

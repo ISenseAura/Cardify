@@ -26,12 +26,15 @@
   },
   "homepage": "https://github.com/sirDonovan/Lanette#readme",
   "dependencies": {
+    "@google/generative-ai": "^0.2.1",
     "@types/eslint": "8.44.9",
     "@types/mocha": "10.0.6",
     "@types/node": "20.10.4",
     "@types/ws": "8.5.10",
     "bufferutil": "4.0.8",
     "esbuild": "0.16.15",
+    "node-fetch": "^3.3.2",
+    "pokemontcgsdk": "^2.0.0",
     "typescript": "5.3.3",
     "utf-8-validate": "6.0.3",
     "ws": "8.15.1"

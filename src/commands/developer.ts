@@ -30,6 +30,14 @@ export const commands: BaseCommandDefinitions = {
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
 	},
+
+	uptime: {
+		command(target, room, user) { // eslint-disable-line @typescript-eslint/no-unused-vars
+			this.say(Tools.toDurationString(process.uptime() * 1000))
+		},
+		aliases: ["ontime"],
+		developerOnly: true,
+	},
 	gitpull: {
 		command(target, room, user) {
 			let result = exec('git pull');

@@ -9,6 +9,8 @@ export const commands: BaseCommandDefinitions = {
 		},
 		pmOnly: true,
 	},
+
+	
 	jointournament: {
 		command(target, room, user) {
 			if (!this.isPm(room) && !user.hasRank(room, 'star')) return;
