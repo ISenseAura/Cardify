@@ -155,7 +155,7 @@ export interface ISavedCustomGrids {
 	grids: ISavedCustomGridData[];
 }
 
-export type LeaderboardType = 'gameLeaderboard' | 'gameHostingLeaderbaord' | 'tournamentLeaderboard' | 'unsortedLeaderboard';
+export type LeaderboardType = 'gameLeaderboard' | 'gameHostingLeaderbaord' | 'tournamentLeaderboard' | 'unsortedLeaderboard' | 'tcgShop';
 
 export interface ILeaderboard {
 	entries: Dict<ILeaderboardEntry>;

@@ -9,10 +9,10 @@ import type { BaseCommandDefinitions } from "../types/command-parser";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as fetch2 from "node-fetch";
-import { RequestInfo, RequestInit } from 'node-fetch';
+import { RequestInfo, RequestInit } from "node-fetch";
 
 global.fetch = (url: RequestInfo, init?: RequestInit) =>
-  import('node-fetch').then(({ default: fetch2 }) => fetch2(url, init));
+	import("node-fetch").then(({ default: fetch2 }) => fetch2(url, init));
 
 import pokemon from "pokemontcgsdk";
 
@@ -160,7 +160,10 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 
 			if (this.isPm()) return this.say("Cannot be used in a PM");
-			if (!user.isRoomauth(room.id) && !user.isDeveloper())
+			if(!user.hasRank(room,"+")) return room.sayPrivateHtml(
+				user,
+				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
+			);
 				return room.sayPrivateHtml(
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
@@ -191,23 +194,47 @@ export const commands: BaseCommandDefinitions = {
 		description: ["evaluates the given expression and displays the result"],
 	},
 
+	viewcard: {
+		command(target, room, user) {
+			// eslint-disable-line @typescript-eslint/no-unused-vars
+
+			let tcgroom = Rooms.get("tcgtabletop");
+
+			let html = `<div style="position:relative;margin:auto;"><img src="${target}" width="250" height="350"/></div>`;
+			tcgroom?.sayPrivateHtml(user,html);
+		},
+		aliases: ["vcard"],
+		pmOnly: true,
+		syntax: ["[expression]"],
+		description: ["evaluates the given expression and displays the result"],
+	},
+
 	generatedeck: {
 		command(target, room, user) {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 
 			if (this.isPm()) return this.say("Cannot be used in a PM");
-			if (!user.isRoomauth(room.id) && !user.isDeveloper())
+			if(!user.hasRank(room,"+")) return room.sayPrivateHtml(
+				user,
+				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
+			);
 				return room.sayPrivateHtml(
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 				);
 
-			const genAI = new GoogleGenerativeAI("AIzaSyCq28woHJ5ZsOp_M6gvfY962idcuawsYk0");
+			const genAI = new GoogleGenerativeAI(
+				"AIzaSyCq28woHJ5ZsOp_M6gvfY962idcuawsYk0"
+			);
 
-            let q = `generate a english pokemon tcg deck based on ${target}. provide common JSON with keys pokemon,trainers,energy,strategy,tips`;
-            let counter = 0;
+			let q = `generate a english pokemon tcg deck based on ${target}. provide common JSON with keys pokemon,trainers,energy,strategy,tips`;
+			let counter = 0;
 
-            this.say("Generating a deck based on " + target  + "... This may take a while.")
+			this.say(
+				"Generating a deck based on " +
+					target +
+					"... This may take a while."
+			);
 			async function run(query, context) {
 				const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
@@ -220,59 +247,83 @@ export const commands: BaseCommandDefinitions = {
 				const result = await model.generateContent(query);
 				const response = await result.response;
 				const text = response.text();
-           
-                if(text.startsWith("```json")) {
-                  
-                    let jst = text.replace("```json","").replace(/(\r\n|\r|\n)/g, '').replace("```","");
-                    console.log(jst)
-                    try {
 
-                        let json = JSON.parse(jst);
-                        let keys = Object.keys(json);
-                        let html = "<div> "
-                        if(keys.includes("pokemon") && keys.includes("trainers") && keys.includes("energy") && keys.includes("strategy")) {
-                            html += `<strong> Deck based on ${target} - </strong> <br><br>`
-                            html += ` <details><summary> <strong style='font-size:12px;'> Pokemon </strong></summary><ul>`
+				if (text.startsWith("```json")) {
+					let jst = text
+						.replace("```json", "")
+						.replace(/(\r\n|\r|\n)/g, "")
+						.replace("```", "");
+					console.log(jst);
+					try {
+						let json = JSON.parse(jst);
+						let keys = Object.keys(json);
+						let html = "<div> ";
+						if (
+							keys.includes("pokemon") &&
+							keys.includes("trainers") &&
+							keys.includes("energy") &&
+							keys.includes("strategy")
+						) {
+							html += `<strong> Deck based on ${target} - </strong> <br><br>`;
+							html += ` <details><summary> <strong style='font-size:12px;'> Pokemon </strong></summary><ul>`;
 
-                            json.pokemon.forEach((card) => {
-                                html += `<li> ${card.name} - x${(card.qty ? card.qty : card.count) ? (card.qty ? card.qty : card.count) : card.quantity} </li>`
-                            })
-                            html += `</ul></details>`
+							json.pokemon.forEach((card) => {
+								html += `<li> ${card.name} - x${
+									(card.qty ? card.qty : card.count)
+										? card.qty
+											? card.qty
+											: card.count
+										: card.quantity
+								} </li>`;
+							});
+							html += `</ul></details>`;
 
-                            html += ` <details><summary> <strong style='font-size:12px;'> Trainers </strong></summary><ul>`
+							html += ` <details><summary> <strong style='font-size:12px;'> Trainers </strong></summary><ul>`;
 
-                            json.trainers.forEach((card) => {
-                                html += `<li> ${card.name} - x${(card.qty ? card.qty : card.count) ? (card.qty ? card.qty : card.count) : card.quantity} </li>`
-                            })
-                            html += `</ul></details>`
+							json.trainers.forEach((card) => {
+								html += `<li> ${card.name} - x${
+									(card.qty ? card.qty : card.count)
+										? card.qty
+											? card.qty
+											: card.count
+										: card.quantity
+								} </li>`;
+							});
+							html += `</ul></details>`;
 
-                            html += ` <details><summary> <strong style='font-size:12px;'> Energies </strong></summary><ul>`
+							html += ` <details><summary> <strong style='font-size:12px;'> Energies </strong></summary><ul>`;
 
-                            json.energy.forEach((card) => {
-                                html += `<li> ${card.name} - x${(card.qty ? card.qty : card.count) ? (card.qty ? card.qty : card.count) : card.quantity} </li>`
-                            })
+							json.energy.forEach((card) => {
+								html += `<li> ${card.name} - x${
+									(card.qty ? card.qty : card.count)
+										? card.qty
+											? card.qty
+											: card.count
+										: card.quantity
+								} </li>`;
+							});
 
-                            html += `</ul></details>`
-                            
-                            html += ` <details><summary> <strong style='font-size:12px;'> Strategy </strong></summary><p> ${json.strategy} </p></details></div>`
+							html += `</ul></details>`;
 
-                            room.sayHtml(`<div> ${html} </div>`);
-                            return;
-                        }
-                       // room.sayHtml(`<div> ${json} </div>`);
-                    }
-                    catch(e) {
-                        console.log(e.message)
-                    
-                    }
-                } else {
-                    counter += 1;
-                    if(counter == 4) return this.say("Sorry, The AI is taking too long to generate response.")
-                   run(q);
-                }
-               
+							html += ` <details><summary> <strong style='font-size:12px;'> Strategy </strong></summary><p> ${json.strategy} </p></details></div>`;
+
+							room.sayHtml(`<div> ${html} </div>`);
+							return;
+						}
+						// room.sayHtml(`<div> ${json} </div>`);
+					} catch (e) {
+						console.log(e.message);
+					}
+				} else {
+					counter += 1;
+					if (counter == 4)
+						return this.say(
+							"Sorry, The AI is taking too long to generate response."
+						);
+					run(q);
+				}
 			}
-                   run(q)
+			run(q);
 		},
 		aliases: ["gdeck"],
 		developerOnly: true,

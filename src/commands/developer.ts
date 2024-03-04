@@ -3,9 +3,13 @@ import fs = require('fs');
 import { copyPokemonShowdownShaBase, exec, getInputFolders } from '../../tools';
 import type { BaseCommandDefinitions } from "../types/command-parser";
 
+import {Packs} from "../pokemon-tcg/packs"
+
 export const commands: BaseCommandDefinitions = {
 	eval: {
 		command(target, room, user) { // eslint-disable-line @typescript-eslint/no-unused-vars
+			let packs = new Packs();
+
 			try {
 				let result = eval(target) as unknown;
 				if (result === null) {
@@ -29,6 +33,14 @@ export const commands: BaseCommandDefinitions = {
 		developerOnly: true,
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
+	},
+
+	say: {
+		command(target, room, user) {
+			this.say(target);
+
+		},
+		developerOnly : true,
 	},
 
 	uptime: {

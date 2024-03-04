@@ -146,3 +146,4 @@ export function load(config: typeof Config): typeof Config {
 
 	return config;
 }
+
