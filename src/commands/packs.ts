@@ -60,7 +60,7 @@ export const commands: BaseCommandDefinitions = {
 						data.cards.forEach((card: any) => {
 							let fullCardHtml = `<div style="position:relative;margin:auto;"><img src="${card.large}" width="250" height="350"/></div>`;
 
-							html += `<button name="send" value="/botmsg cardify,]vcard ${card.large}" style="background: url('${card.image}') center/contain no-repeat; height: 100px; width: 75px; display: inline-block; margin: 0 1px;"></button>`;
+							html += `<button name="send" value="/botmsg cardify,${Config.commandCharacter}vcard ${card.large}" style="background: url('${card.image}') center/contain no-repeat; height: 100px; width: 75px; display: inline-block; margin: 0 1px;"></button>`;
 						});
 
 						html += `</ul></details></div>`;
@@ -139,7 +139,7 @@ export const commands: BaseCommandDefinitions = {
 						data.cards.forEach((card: any) => {
 							let fullCardHtml = `<div style="position:relative;margin:auto;"><img src="${card.large}" width="250" height="350"/></div>`;
 
-							html += `<button name="send" value="/botmsg cardify,]vcard ${card.large}" style="background: url('${card.image}') center/contain no-repeat; height: 100px; width: 75px; display: inline-block; margin: 0 1px;"></button>`;
+							html += `<button name="send" value="/botmsg cardify,${Config.commandCharacter}vcard ${card.large}" style="background: url('${card.image}') center/contain no-repeat; height: 100px; width: 75px; display: inline-block; margin: 0 1px;"></button>`;
 						});
 
 						html += `</ul></details></div>`;
