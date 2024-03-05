@@ -37,7 +37,7 @@ export const commands: BaseCommandDefinitions = {
 							let fullCardHtml = `<div style="position:relative;margin:auto;"><img src="${card.large}" width="250" height="350"/></div>`;
 
                             if(i % 16 == 0 && i != 0) html += `</ul></details><details><summary> View Cards </summary><ul>`;
-							html += `<button name="send" value="/botmsg cardify,]vcard ${card.large}" style="background: url('${card.image}') center/contain no-repeat; height: 100px; width: 75px; display: inline-block; margin: 0 1px;"></button>`;
+							html += `<button name="send" value="/botmsg cardify,${Config.commandCharacter}vcard ${card.large}" style="background: url('${card.image}') center/contain no-repeat; height: 100px; width: 75px; display: inline-block; margin: 0 1px;"></button>`;
 						});
 
 						html += `</ul></details></div>`;

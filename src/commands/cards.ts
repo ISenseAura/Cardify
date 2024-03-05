@@ -11,6 +11,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as fetch2 from "node-fetch";
 import { RequestInfo, RequestInit } from "node-fetch";
 
+import { Packs } from "../pokemon-tcg/packs";
+
 global.fetch = (url: RequestInfo, init?: RequestInit) =>
 	import("node-fetch").then(({ default: fetch2 }) => fetch2(url, init));
 
@@ -160,14 +162,15 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 
 			if (this.isPm()) return this.say("Cannot be used in a PM");
-			if(!user.hasRank(room,"+")) return room.sayPrivateHtml(
-				user,
-				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
-			);
+			if (!user.hasRank(room, "+"))
 				return room.sayPrivateHtml(
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 				);
+			return room.sayPrivateHtml(
+				user,
+				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
+			);
 			function a() {
 				let randomSet = Tools.sampleOne(pkmnSets);
 				let rarity = Tools.toId(Tools.sampleOne(rarities));
@@ -201,7 +204,7 @@ export const commands: BaseCommandDefinitions = {
 			let tcgroom = Rooms.get("tcgtabletop");
 
 			let html = `<div style="position:relative;margin:auto;"><img src="${target}" width="250" height="350"/></div>`;
-			tcgroom?.sayPrivateHtml(user,html);
+			tcgroom?.sayPrivateHtml(user, html);
 		},
 		aliases: ["vcard"],
 		pmOnly: true,
@@ -214,14 +217,15 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 
 			if (this.isPm()) return this.say("Cannot be used in a PM");
-			if(!user.hasRank(room,"+")) return room.sayPrivateHtml(
-				user,
-				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
-			);
+			if (!user.hasRank(room, "+"))
 				return room.sayPrivateHtml(
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 				);
+			return room.sayPrivateHtml(
+				user,
+				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
+			);
 
 			const genAI = new GoogleGenerativeAI(
 				"AIzaSyCq28woHJ5ZsOp_M6gvfY962idcuawsYk0"
@@ -329,5 +333,30 @@ export const commands: BaseCommandDefinitions = {
 		developerOnly: true,
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
+	},
+
+	cardsleaderboard: {
+		command(target, room, user) {
+			let packs = new Packs();
+
+			let db = packs.getDatabase("collection");
+			let usersData = {};
+
+			function sortObj(obj, n) {
+				return Object.entries(obj)
+					.sort((a, b) => b[1] - a[1])
+					.map((el) => el[0])
+					.slice(0, n > obj.length ? obj.length : n);
+			}
+
+			Object.keys(db).forEach((key: any) => {
+				usersData[key] = db[key].cards.length;
+			});
+
+			let sorted = sortObj(usersData, 10);
+
+			console.log(sorted);
+		},
+		aliases: ["clb"],
 	},
 };

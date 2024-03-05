@@ -48,13 +48,13 @@ export class Packs {
 			"Rare Ultra",
 			"Uncommon",
 		];
-		this.slot1 = { "rarity:rare rarity:holo -rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 64, "rarity:prism rarity:star": 16, "rarity:amazing rarity:rare": 8 };
+		this.slot1 = { "rarity:rare rarity:holo -rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 16, "rarity:prism rarity:star": 16, "rarity:amazing rarity:rare": 8 };
 		this.slot2 = {
-			"!rarity:rare": 64,
-			"rarity:rare rarity:holo -rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 32,
-			"rarity:rare rarity:holo rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 32,
-			"rarity:rare rarity:holo rairty:ex -rarity:gx -rarity:vmax -rarity:ultra": 32,
-			"rarity:rare rarity:holo rarity:gx -rarity:vmax -rarity:ultra": 16,
+			"!rarity:rare": 32,
+			"rarity:rare rarity:holo -rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 8,
+			"rarity:rare rarity:holo rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 16,
+			"rarity:rare rarity:holo rairty:ex -rarity:gx -rarity:vmax -rarity:ultra": 16,
+			"rarity:rare rarity:holo rarity:gx -rarity:vmax -rarity:ultra": 8,
 			"rarity:rare rarity:holo rarity:vmax -rarity:ultra": 8,
 			"rarity:rare rarity:shiny": 4,
 			"rarity:rare rarity:ultra": 2,
@@ -111,17 +111,20 @@ export class Packs {
 
 		let slot1Card;
 		let slot2Card;
+		let slot3Card;
 
 		let cards = [];
 
 		console.log(id)
 
 		let rs1 = await pokemon.card.all({ q: `set.id:${id} ${slot1}` });
-		if(!rs1.length) rs1 = await pokemon.card.all({ q: `set.id:${id} !rarity:rare` });
+	//	if(!rs1.length) rs1 = await pokemon.card.all({ q: `set.id:${id} !rarity:rare` });
 		if(!rs1.length) rs1 = await pokemon.card.all({ q: `set.id:${id} rarity:rare` });
 
 		console.log(rs1);
-		slot1Card = Tools.sampleOne(rs1);
+		let aa = Tools.sampleMany(rs1,2);
+		slot1Card = aa[1]
+		slot3Card = aa[0]
 
 		let c6 = {
 			id: slot1Card.id,
@@ -143,11 +146,16 @@ export class Packs {
 		});
 
 		let en = await pokemon.card.all({
-			q: `set.id:${"sm1"} supertype:energy subtypes:basic`,
+			q: `set.id:${id} supertype:energy subtypes:basic`,
+		});
+
+
+		if(!en.length) en = await pokemon.card.all({
+			q: `set.id:${"sm1"} supertype:energy -name:Fairy subtypes:basic`,
 		});
 
 		console.log(en.length)
-		Tools.sampleMany(cm, 5).forEach((a, i) => {
+		Tools.sampleMany(cm, 4).forEach((a, i) => {
 			cards[i] = {
 				id: a.id,
 				name: a.name,
@@ -187,6 +195,15 @@ export class Packs {
 			rarity: slot2Card.rarity,
 		};
 
+		let c5 = {
+			id: slot3Card.id,
+			name: slot3Card.name,
+			image: slot3Card.images.small,
+			large: slot3Card.images.large,
+			rarity: slot3Card.rarity,
+		};
+
+		cards[4] = c5;
 		cards[5] = c6;
 		cards[6] = c7;
 		cards[7] = c8;

@@ -26,6 +26,15 @@ export const commands: BaseCommandDefinitions = {
 			if(!user.autoconfirmed)  return room.sayPrivateHtml(user,` <p style="color:red;"> Only autoconfirmed users can use this command </p>`)
 */
 			let packIDs = [
+				"base1",
+				"base2",
+				"base3",
+				"base4",
+				"base5",
+				"gym1",
+				"gym2",
+				'neo3', 'neo4', 'base6', 'ecard1', 'ecard2', 'ecard3', 'ex1', 'ex2', 'ex3', 'np', 'ex4', 'ex5', 'ex6', 'pop1', 'ex7', 'ex8', 'ex9', 'ex10', 'pop2', 'ex11', 'ex12', 'pop3', 'ex13', 'ex14', 'pop4', 'ex15', 'pop5', 'ex16', 'dp1', 'dpp', 'dp2', 'pop6', 'dp3',
+				'bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'xyp', 'bw11', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9',
 				"swsh1",
 				"swsh2",
 				"swsh3",
@@ -37,8 +46,11 @@ export const commands: BaseCommandDefinitions = {
 				"sv2",
 				"sv3",
 				"sv4",
+				"sv3pt5",
 				"swsh45",
 				"swsh35",
+				'xy12', 'sm1', 'smp', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'sma',
+				'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45', 'swsh45sv'
 			];
 
 			let rares = [
@@ -104,21 +116,33 @@ export const commands: BaseCommandDefinitions = {
 
 			if(!user.autoconfirmed)  return room.sayPrivateHtml(user,` <p style="color:red;"> Only autoconfirmed users can use this command </p>`)
 */
-			let packIDs = [
-				"swsh1",
-				"swsh2",
-				"swsh3",
-				"swsh4",
-				"swsh5",
-				"swsh6",
-				"swsh7",
-				"sv1",
-				"sv2",
-				"sv3",
-				"sv4",
-				"swsh45",
-				"swsh35",
-			];
+let packIDs = [
+	"base1",
+	"base2",
+	"base3",
+	"base4",
+	"base5",
+	"gym1",
+	"gym2",
+	'neo3', 'neo4', 'base6', 'ecard1', 'ecard2', 'ecard3', 'ex1', 'ex2', 'ex3', 'np', 'ex4', 'ex5', 'ex6', 'pop1', 'ex7', 'ex8', 'ex9', 'ex10', 'pop2', 'ex11', 'ex12', 'pop3', 'ex13', 'ex14', 'pop4', 'ex15', 'pop5', 'ex16', 'dp1', 'dpp', 'dp2', 'pop6', 'dp3',
+	'bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'xyp', 'bw11', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9',
+	"swsh1",
+	"swsh2",
+	"swsh3",
+	"swsh4",
+	"swsh5",
+	"swsh6",
+	"swsh7",
+	"sv1",
+	"sv2",
+	"sv3",
+	"sv4",
+	"sv3pt5",
+	"swsh45",
+	"swsh35",
+	'xy12', 'sm1', 'smp', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'sma',
+	'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45', 'swsh45sv'
+];
 
 			let rares = [
 				"rare holo v",
