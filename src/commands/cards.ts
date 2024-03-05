@@ -351,8 +351,8 @@ export const commands: BaseCommandDefinitions = {
 				usersData[key] = db[key].cards.length;
 			});
 
-			console.log(usersData)
-			let sorted = sortObj(usersData, 10);
+			let tt = parseInt(target) ? parseInt(target) : 10;
+			let sorted = sortObj(usersData, tt);
 
 			let html = `<table style="border-collapse: collapse; border-spacing: 0; border-color: #aaa"> <colgroup> <col style="width: 40px" /><col style="width: 160px" />  <col style="width: 150px" /> </colgroup> <tbody>`;
 			html += `<tr> <th style=" font-family: 'arial', sans-serif; font-size: 14px; font-weight: normal; padding: 2px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #fff; background-color: #5a0b72; font-weight: bold; border-color: inherit; text-align: center; vertical-align: top; " > Rank </th> <th style=" font-family: 'arial', sans-serif; font-size: 14px; font-weight: normal; padding: 2px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #fff; background-color: #5a0b72; font-weight: bold; border-color: inherit; text-align: center; vertical-align: top; " > Name </th> <th style=" font-family: 'arial', sans-serif; font-size: 14px; font-weight: normal; padding: 2px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #fff; background-color: #5a0b72; font-weight: bold; border-color: inherit; text-align: center; vertical-align: top; " > Cards </th> </tr>`
