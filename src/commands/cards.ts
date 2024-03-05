@@ -162,15 +162,11 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 
 			if (this.isPm()) return this.say("Cannot be used in a PM");
-			if (!user.hasRank(room, "+"))
-				return room.sayPrivateHtml(
+			if (!user.hasRank(room, "+")) return room.sayPrivateHtml(
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 				);
-			return room.sayPrivateHtml(
-				user,
-				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
-			);
+
 			function a() {
 				let randomSet = Tools.sampleOne(pkmnSets);
 				let rarity = Tools.toId(Tools.sampleOne(rarities));
@@ -222,10 +218,6 @@ export const commands: BaseCommandDefinitions = {
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 				);
-			return room.sayPrivateHtml(
-				user,
-				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
-			);
 
 			const genAI = new GoogleGenerativeAI(
 				"AIzaSyCq28woHJ5ZsOp_M6gvfY962idcuawsYk0"
@@ -337,6 +329,12 @@ export const commands: BaseCommandDefinitions = {
 
 	cardsleaderboard: {
 		command(target, room, user) {
+
+			if (!user.hasRank(room, "+"))
+			return room.sayPrivateHtml(
+				user,
+				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
+			);
 			let packs = new Packs();
 
 			let db = packs.getDatabase("collection");
@@ -353,8 +351,23 @@ export const commands: BaseCommandDefinitions = {
 				usersData[key] = db[key].cards.length;
 			});
 
+			console.log(usersData)
 			let sorted = sortObj(usersData, 10);
 
+			let html = `<table style="border-collapse: collapse; border-spacing: 0; border-color: #aaa"> <colgroup> <col style="width: 40px" /><col style="width: 160px" />  <col style="width: 150px" /> </colgroup> <tbody>`;
+			html += `<tr> <th style=" font-family: 'arial', sans-serif; font-size: 14px; font-weight: normal; padding: 2px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #fff; background-color: #5a0b72; font-weight: bold; border-color: inherit; text-align: center; vertical-align: top; " > Rank </th> <th style=" font-family: 'arial', sans-serif; font-size: 14px; font-weight: normal; padding: 2px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #fff; background-color: #5a0b72; font-weight: bold; border-color: inherit; text-align: center; vertical-align: top; " > Name </th> <th style=" font-family: 'arial', sans-serif; font-size: 14px; font-weight: normal; padding: 2px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #fff; background-color: #5a0b72; font-weight: bold; border-color: inherit; text-align: center; vertical-align: top; " > Cards </th> </tr>`
+			sorted.forEach((id,j) => {
+				let i = j + 1;
+				let name = Users.get(id) ? Users.get(id).name : id;
+				let total = usersData[id]
+
+				if((j % 2) == 0) html += `<tr> <td style=" font-family: 'arial', sans-serif; padding: 2px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #333; background-color: #fff; background-color: #ffffff; border-color: inherit; text-align: center; vertical-align: top; font-weight: bold; " > ${i} </td> <td style=" font-family: 'arial', sans-serif; padding: 2px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #333; background-color: #fff; background-color: #ffffff; border-color: inherit; text-align: center; vertical-align: top; font-weight: bold; " > ${name} </td> <td style=" font-family: 'arial', sans-serif; padding: 2px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #333; background-color: #fff; background-color: #ffffff; border-color: inherit; text-align: center; vertical-align: top; font-weight: bold; " > ${total} </td> </tr>`
+				if((j % 2) !== 0) html += `<tr> <td style=" font-family: 'arial', sans-serif; padding: 2px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #333; background-color: #fff; background-color: #cccccc; border-color: inherit; text-align: center; vertical-align: top; font-weight: bold; " > ${i} </td> <td style=" font-family: 'arial', sans-serif; padding: 2px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #333; background-color: #fff; background-color: #cccccc; border-color: inherit; text-align: center; vertical-align: top; font-weight: bold; " > ${name} </td> <td style=" font-family: 'arial', sans-serif; padding: 2px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: #aaa; color: #333; background-color: #fff; background-color: #cccccc; border-color: inherit; text-align: center; vertical-align: top; font-weight: bold; " > ${total} </td> </tr>`
+			})
+			
+			html += `</tbody></table>`
+
+			room.sayHtml(html);
 			console.log(sorted);
 		},
 		aliases: ["clb"],
