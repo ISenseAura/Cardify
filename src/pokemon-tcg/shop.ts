@@ -164,15 +164,20 @@ class Shop {
 		let item = this.getItem(name, type);
 		if (!item) return "Item not found";
 
+
 		if (Tools.toId(item.name) == "daily") {
 			let packs = new Packs();
 
+
 			let dt = packs.canOpenDaily(user);
 			if (dt > 1) {
-				return this.room?.sayPrivateHtml(user,`You have already claimed your daily, reseting in ${Tools.toDurationString(
+
+				 this.room?.sayPrivateHtml(user,`You have already claimed your daily, reseting in ${Tools.toDurationString(
 					dt
 				)}`);
+                return;
 			}
+
 
 			let packIDs = [
 				"base1",
@@ -299,7 +304,6 @@ class Shop {
 					});
 
 					html += `</ul></details></div>`;
-                    console.log(html)
                     this.room?.sayHtml(`<small style="font-size:11px;">[TCG Shop] </small><username> ${user.name} </username> claimed their daily pack `)
 					this.room?.sayHtml(html);
 					return data;
