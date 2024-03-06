@@ -168,18 +168,15 @@ class Shop {
 		if (Tools.toId(item.name) == "daily") {
 			let packs = new Packs();
 
-   
+            console.log("test1");
 
 			let dt = packs.canOpenDaily(user);
 			if (dt > 1) {
                 console.log("test2");
-
-				 this.room?.sayPrivateHtml(user,`You have already claimed your daily, reseting in ${Tools.toDurationString(
-					dt
-				)}`);
+                this.room?.sayPrivateHtml(user,`You have already claimed your daily, reseting in ${Tools.toDurationString(dt)}`);
                 return;
 			}
-     
+            console.log("test3");
 
 
 			let packIDs = [
