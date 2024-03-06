@@ -368,7 +368,7 @@ class TCGManager extends HtmlPageBase {
 export const commands: BaseCommandDefinitions = {
 	["tcg"]: {
 		command(target, room, user) {
-			if (!this.isPm(room)) return;
+		//	if (!this.isPm(room)) return;
 			const targets = target.split(",");
 			const botRoom = user.getBotRoom();
 			if (!botRoom)

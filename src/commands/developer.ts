@@ -3,14 +3,16 @@ import fs = require('fs');
 import { copyPokemonShowdownShaBase, exec, getInputFolders } from '../../tools';
 import type { BaseCommandDefinitions } from "../types/command-parser";
 
-import {packs} from "../pokemon-tcg/packs"
+import { packs } from "../pokemon-tcg/packs"
 
 export const commands: BaseCommandDefinitions = {
 	eval: {
+	
 		command(target, room, user) { // eslint-disable-line @typescript-eslint/no-unused-vars
 
 
 			try {
+				let p = packs;
 				let result = eval(target) as unknown;
 				if (result === null) {
 					result = "null";
