@@ -173,6 +173,7 @@ class TCGManager extends HtmlPageBase {
 
 	buyItem(user: User, name: string, type: string) {
 		shop.buyItem(user, name, type);
+		this.send();
 	}
 
 	render(): string {
@@ -326,10 +327,10 @@ class TCGManager extends HtmlPageBase {
 								let keys = Object.keys(items);
 								keys.forEach((key) => {
 									let item = items[key];
+									console.log(packs.canOpenDaily(Users.get(this.userId)))
 									html += `<tr><td> ${item.name} </td> <td> ${item.description} </td> <td> ${item.price} </td>`;
 									html +=
-										"<td>" +
-										this.getQuietPmButton(
+										"<td>" + ( packs.canOpenDaily(Users.get(this.userId)) === true ? this.getQuietPmButton(
 											this.commandPrefix +
 												", " +
 												buyItem +
@@ -339,7 +340,7 @@ class TCGManager extends HtmlPageBase {
 												item.type,
 											"Claim"
 										) +
-										"</td></tr>";
+										"</td></tr>" : "Claimed");
 								});
 							}
 							break;
