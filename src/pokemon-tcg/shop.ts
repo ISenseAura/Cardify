@@ -299,6 +299,7 @@ class Shop {
 					});
 
 					html += `</ul></details></div>`;
+                    console.log(html)
                     this.room?.sayHtml(`<small style="font-size:11px;">[TCG Shop] </small><username> ${user.name} </username> claimed their daily pack `)
 					this.room?.sayHtml(html);
 					return data;
