@@ -299,13 +299,13 @@ class Shop {
 					});
 
 					html += `</ul></details></div>`;
-                    this.room?.sayHtml(`<small style="font-size:12px;">[TCG Shop] </small><username> ${user.name} </username> claimed their daily pack `)
+                    this.room?.sayHtml(`<small style="font-size:11px;">[TCG Shop] </small><username> ${user.name} </username> claimed their daily pack `)
 					this.room?.sayHtml(html);
 					return data;
 				})
 				.catch((e: any) => {
 					Users.get("pokem9n")?.say(e.message);
-					return this.room?.sayPrivateHtml(user,"Could not find a pack for you, maybe try again coz you definitely deserve a free pack!");
+					return this.room?.sayPrivateHtml(user,"<small style='font-size:11px;'>[TCG Shop] </small> Could not find a pack for you, maybe try again coz you definitely deserve a free pack!");
 				});
 		}
 	}
