@@ -330,8 +330,7 @@ export const commands: BaseCommandDefinitions = {
 	cardsleaderboard: {
 		command(target, room, user) {
 
-			if (!user.hasRank(room, "+"))
-			return room.sayPrivateHtml(
+			if (!user.hasRank(room, "+")) return room.sayPrivateHtml(
 				user,
 				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 			);

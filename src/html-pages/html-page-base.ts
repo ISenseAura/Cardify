@@ -556,6 +556,8 @@ export abstract class HtmlPageBase {
 			style += 'border-color: #ffffff;';
 		}
 
+		style = "cursor: pointer; display: inline-block; padding: 5px 10px; background-color: #40435e; border-radius: 5px; margin-right: 10px;"
+
 		return Client.getQuietPmButton(this.getPmRoom(), message, label, disabled, style);
 	}
 
