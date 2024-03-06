@@ -11,7 +11,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as fetch2 from "node-fetch";
 import { RequestInfo, RequestInit } from "node-fetch";
 
-import { Packs } from "../pokemon-tcg/packs";
+import { packs } from "../pokemon-tcg/packs";
 
 global.fetch = (url: RequestInfo, init?: RequestInit) =>
 	import("node-fetch").then(({ default: fetch2 }) => fetch2(url, init));
@@ -334,7 +334,7 @@ export const commands: BaseCommandDefinitions = {
 				user,
 				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 			);
-			let packs = new Packs();
+
 
 			let db = packs.getDatabase("collection");
 			let usersData = {};

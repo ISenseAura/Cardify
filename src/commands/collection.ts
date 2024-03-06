@@ -11,7 +11,7 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 			this.say("You can view your collection from the TCG Manager page. type ``.tcg`` to open it.")
 			return;
-			let packs = new Packs();
+	
 			/*
 			room.say("/cmd userdetails " + user.id);
 

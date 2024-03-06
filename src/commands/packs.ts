@@ -3,13 +3,13 @@ import fs = require("fs");
 import { copyPokemonShowdownShaBase, exec, getInputFolders } from "../../tools";
 import type { BaseCommandDefinitions } from "../types/command-parser";
 
-import { Packs } from "../pokemon-tcg/packs";
+import { packs } from "../pokemon-tcg/packs";
 
 export const commands: BaseCommandDefinitions = {
 	daily: {
 		command(target, room, user) {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
-			let packs = new Packs();
+
 
 			this.say("Command removed, You can get your daily pack from the shop. type ``.tcg`` to open shop.")
 			return;
@@ -105,7 +105,7 @@ export const commands: BaseCommandDefinitions = {
 				user,
 				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 			);
-			let packs = new Packs();
+		
 
 			let tuser = Users.get(Tools.toId(target));
 			if (!tuser) return room.say("User not found");
@@ -196,7 +196,7 @@ let packIDs = [
 				user,
 				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 			);
-			let packs = new Packs();
+		
 
 			let tuser = Users.get(Tools.toId(target));
 			if (!tuser) return room.say("User not found");

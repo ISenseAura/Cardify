@@ -14,7 +14,7 @@ import path = require("path");
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 
-export class Packs {
+ class Packs {
 	private rarities: Array<string>;
 	private slot1: Record<string, number>;
 	private slot2: Record<string, number>;
@@ -288,3 +288,5 @@ export class Packs {
 		}
 	}
 }
+
+export let packs = new Packs();

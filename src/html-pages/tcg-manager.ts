@@ -9,9 +9,8 @@ import { CLOSE_COMMAND, HtmlPageBase } from "./html-page-base";
 
 import { shop } from "../pokemon-tcg/shop";
 
-import { Packs } from "../pokemon-tcg/packs";
+import { packs } from "../pokemon-tcg/packs";
 
-let packs = new Packs();
 
 const baseCommand = "tcg";
 const chooseIntro = "chooseintro";

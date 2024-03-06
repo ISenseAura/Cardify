@@ -3,7 +3,7 @@ import { User } from "../users";
 import path = require("path");
 import { Path } from "typescript";
 
-import { Packs } from "./packs";
+import { packs } from "./packs";
 import { Room } from "../rooms";
 
 export type ItemType = "pack" | "deck" | "free";
@@ -166,7 +166,7 @@ class Shop {
 
 
 		if (Tools.toId(item.name) == "daily") {
-			let packs = new Packs();
+	
 
             console.log("test1");
 
