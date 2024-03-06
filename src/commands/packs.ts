@@ -11,6 +11,8 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 			let packs = new Packs();
 
+			this.say("Command removed, You can get your daily pack from the shop. type ``.tcg`` to open shop.")
+			return;
 			let dt = packs.canOpenDaily(user);
 			if (dt > 1) {
 				return room.say(
