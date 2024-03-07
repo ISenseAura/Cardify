@@ -11,8 +11,7 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 
 
-			this.say("Command removed, You can get your daily pack from the shop. type ``.tcg`` to open shop.")
-			return;
+		
 			let dt = packs.canOpenDaily(user);
 			if (dt > 1) {
 				return room.say(
@@ -21,7 +20,8 @@ export const commands: BaseCommandDefinitions = {
 					)}`
 				);
 			}
-			room.say(`${user.name} is opening their daily pack...`);
+			room.say(`You can claim your daily from the shop, type ${"``.tcg``"} in the PMs to open the shop`);
+			return;
 			/*
 			room.say("/cmd userdetails " + user.id);
 
