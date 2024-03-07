@@ -162,7 +162,7 @@ export const commands: BaseCommandDefinitions = {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
 
 			if (this.isPm()) return this.say("Cannot be used in a PM");
-			if (!user.hasRank(room, "+")) return room.sayPrivateHtml(
+			if (!user.isRoomauth(room) && !user.isDeveloper()) return room.sayPrivateHtml(
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
 				);
