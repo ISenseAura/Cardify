@@ -11,6 +11,8 @@ import { shop } from "../pokemon-tcg/shop";
 
 import { packs } from "../pokemon-tcg/packs";
 
+import { currency } from "../pokemon-tcg/currency";
+
 
 const baseCommand = "tcg";
 const chooseIntro = "chooseintro";
@@ -284,7 +286,7 @@ class TCGManager extends HtmlPageBase {
 			case "shop":
 				{
 					html +=
-						"<br> Your Balance : <strong> 0.00 <i><small> haha you poor :P </small></i> </strong> <br> <br>";
+						`<br> Your Balance : <strong> ${currency.get(Users.get(this.userId))} <i><small> haha you poor :P </small></i> </strong> <br> <br>`;
 
 					let deckView = this.currentShopView == "deck";
 					let packView = this.currentShopView == "pack";
