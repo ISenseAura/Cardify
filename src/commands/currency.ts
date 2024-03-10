@@ -129,7 +129,7 @@ export const commands: BaseCommandDefinitions = {
 
 			html += `</tbody></table>`;
 
-			room.sayPrivateHtml(user, html);
+			room.sayHtml(html);
 		},
 		aliases: ["rplb"],
 	},
