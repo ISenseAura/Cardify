@@ -72,7 +72,7 @@ export const commands: BaseCommandDefinitions = {
 			} else {
 				if (
 					!user.isDeveloper() &&
-					!user.isRoomauth(room)) &&
+					!user.isRoomauth(room) &&
 					!this.isPm()
 				) {
 					user.say(
