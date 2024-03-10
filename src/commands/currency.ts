@@ -93,7 +93,7 @@ export const commands: BaseCommandDefinitions = {
 
 	richpeople: {
 		command(target, room, user) {
-			if (!user.hasRank(room, "+") && !user.isDeveloper())
+			if (!user.isRoomauth(room) && !user.isDeveloper())
 				return user.say("Access Denied");
 			let db = currency.db;
 			let usersData = {};
