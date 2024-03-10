@@ -188,7 +188,6 @@ export const commands: BaseCommandDefinitions = {
 			a();
 		},
 		aliases: ["rcard"],
-		developerOnly: true,
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
 	},
@@ -322,7 +321,6 @@ export const commands: BaseCommandDefinitions = {
 			run(q);
 		},
 		aliases: ["gdeck"],
-		developerOnly: true,
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
 	},

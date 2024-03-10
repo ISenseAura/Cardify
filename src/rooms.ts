@@ -11,6 +11,8 @@ import type { IRepeatedMessage, IRoomMessageOptions, RoomType } from "./types/ro
 import type { IUserHostedTournament, TournamentType } from "./types/tournaments";
 import type { User } from "./users";
 
+import { currency } from "./pokemon-tcg/currency";
+
 type RoomCreateListener = (room: Room) => void;
 
 const DEFAULT_MODCHAT = 'off';
@@ -50,6 +52,7 @@ export class Room {
 	userHostedGame: UserHostedGame | null = null;
 	readonly users = new Set<User>();
 
+	onlineTime: Record<string,number>;
 	readonly id!: string;
 	readonly publicId!: string;
 	readonly title!: string;
@@ -73,6 +76,7 @@ export class Room {
 				parentRoom.subRoom = this;
 			}
 		}
+		this.onlineTime = {};
 	}
 
 	destroy(): void {
@@ -244,6 +248,10 @@ export class Room {
 		if (this.tournament) this.tournament.onUserJoinRoom(this, user);
 		if (this.userHostedGame) this.userHostedGame.onUserJoinRoom(this, user);
 
+		if(this.id == "tcgtabletop") {
+			 this.onlineTime[user.id] = (new Date()).getTime();
+			 if(!currency.db[user.id]) currency.add(user,0,"Cardify","Initial Balance")
+		}
 		if(Config.roomIntro[this.id]) {
 			this.sayPrivateUhtml(user,"roomintro",Config.roomIntro[this.id])
 		}
@@ -252,6 +260,11 @@ export class Room {
 	onUserLeave(user: User): void {
 		this.users.delete(user);
 		user.rooms.delete(this);
+		if(this.onlineTime[user.id] > 1 && this.id == "tcgtabletop") {
+		let secs = ((new Date()).getTime() - this.onlineTime[user.id]) / 1000
+		currency.awardPerSec(user,secs);
+		this.onlineTime[user.id] = 0;
+		}
 		if (user.timers && this.id in user.timers) {
 			clearTimeout(user.timers[this.id]);
 			// @ts-expect-error

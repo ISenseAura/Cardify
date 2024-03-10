@@ -4,6 +4,8 @@ import { copyPokemonShowdownShaBase, exec, getInputFolders } from '../../tools';
 import type { BaseCommandDefinitions } from "../types/command-parser";
 
 import { packs } from "../pokemon-tcg/packs"
+import { currency } from '../pokemon-tcg/currency';
+import { shop } from '../pokemon-tcg/shop';
 
 export const commands: BaseCommandDefinitions = {
 	eval: {
@@ -12,7 +14,9 @@ export const commands: BaseCommandDefinitions = {
 
 
 			try {
-				let p = packs;
+				let Packs = packs;
+				let Currency = currency;
+				let Shop = shop;
 				let result = eval(target) as unknown;
 				if (result === null) {
 					result = "null";
@@ -60,6 +64,7 @@ export const commands: BaseCommandDefinitions = {
 				return;
 			}
 
+			/*
 			const privateRepo = getInputFolders()['Lanette-private'].inputPath;
 			if (fs.existsSync(privateRepo)) {
 				const currentDirecory = process.cwd();
@@ -75,6 +80,7 @@ export const commands: BaseCommandDefinitions = {
 				}
 			}
 
+			*/
 			user.say("Successfully ran ``git pull``.");
 		},
 		developerOnly: true,

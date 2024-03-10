@@ -17,6 +17,8 @@ declare var Tools: import('./tools').Tools;
 declare var Tournaments: import('./tournaments').Tournaments;
 declare var Users: import('./users').Users;
 
+
+
 declare module 'pokemontcgsdk';
 
 declare var _inputFolders: import('./types/root').InputFolders | undefined;
