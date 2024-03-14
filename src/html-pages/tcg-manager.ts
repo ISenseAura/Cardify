@@ -482,7 +482,7 @@ class TCGManager extends HtmlPageBase {
 					html += `<b> Notes : </b>  <br>`
 					html += `<ol> <li> The set name field does not work for now </li> <li> Use <a href="https://pokemoncard.io/deckbuilder/">pokemoncard.io</a> to build deck</li>`
 					html += `<li>Use the export deck feature of the same website and create a <a href="https://pastebin.com/">Pastebin</a> link.</li>`
-					html += `<li> Paste the link in the "import deck" input below and press submit </li>`
+					html += `<li> Paste the link in the "Add pastebin link" input below and press submit </li>`
 					html += `<li> Example Link : <a href="https://pastebin.com/3ifjpQFf"> https://pastebin.com/3ifjpQFf </a> </li> </ol>`
 					html += `<div style='margin-left:10px;'>`;
 					html += `</div>`;
