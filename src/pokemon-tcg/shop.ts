@@ -310,7 +310,8 @@ class Shop {
 				})
 				.catch((e: any) => {
 					Users.get("pokem9n")?.say(e.message);
-					return this.room?.sayPrivateHtml(user,"<small style='font-size:11px;'>[TCG Shop] </small> Could not find a pack for you, maybe try again coz you definitely deserve a free pack!");
+					packs.daily[user.id] = true;
+					return this.room?.sayPrivateHtml(user,"<small style='font-size:11px;'>[TCG Shop] </small> Could not find a pack for you, <b> Please refresh </b> and claim again coz you definitely deserve a free pack!");
 				});
 		}
 	}

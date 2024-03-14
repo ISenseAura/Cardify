@@ -6,17 +6,35 @@ import type { BaseCommandDefinitions } from "../types/command-parser";
 import { packs } from "../pokemon-tcg/packs"
 import { currency } from '../pokemon-tcg/currency';
 import { shop } from '../pokemon-tcg/shop';
+import {Decks} from '../pokemon-tcg/simulator/decks'
+
+import { Battles } from '../pokemon-tcg/simulator/battle';
+
+import pokemon from "pokemontcgsdk"
+
+import Simulator from './src/simulator';
+
+
+
+
+
 
 export const commands: BaseCommandDefinitions = {
 	eval: {
 	
 		command(target, room, user) { // eslint-disable-line @typescript-eslint/no-unused-vars
 
+			let sim = new Simulator()
 
 			try {
 				let Packs = packs;
 				let Currency = currency;
 				let Shop = shop;
+				let API = pokemon;
+				 let decks = Decks;
+				 let BTS = Battles;
+				
+				//let sim = new Simulator();
 				let result = eval(target) as unknown;
 				if (result === null) {
 					result = "null";
@@ -39,6 +57,15 @@ export const commands: BaseCommandDefinitions = {
 		developerOnly: true,
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
+	},
+
+	test: {
+		command(target,room,user) {
+			pokemon.set.all({ q: 'ptcgoCode:par' })
+  .then(result => {
+      console.log(result)  })
+		},
+		developerOnly:true
 	},
 
 	say: {

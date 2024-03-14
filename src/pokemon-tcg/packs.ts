@@ -19,7 +19,7 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 	private slot1: Record<string, number>;
 	private slot2: Record<string, number>;
 	private dir: string;
-	private daily: any;
+	 daily: any;
 	private collection: any;
 
 	constructor() {
