@@ -24,7 +24,7 @@ export const commands: BaseCommandDefinitions = {
 					case "take":
 					case "rob":
 						{
-							if (!user.isDeveloper())
+							if (!user.isDeveloper() && !user.isRoomauth(room))
 								return user.say("Access Denied");
 							let reason = opts[2];
 							let amt = parseFloat(opts[1]);
@@ -55,7 +55,7 @@ export const commands: BaseCommandDefinitions = {
 
 					default: {
 						let tuser = Users.get(Tools.toId(target));
-						if (!user.isDeveloper() && !user.hasRank(room, "+"))
+						if (!user.isDeveloper() && !user.isRoomauth(room))
 							return user.say(
 								`You cannot view other users' wallet`
 							);
@@ -72,7 +72,7 @@ export const commands: BaseCommandDefinitions = {
 			} else {
 				if (
 					!user.isDeveloper() &&
-					!user.hasRank(room, "+") &&
+					!user.isRoomauth(room) &&
 					!this.isPm()
 				) {
 					user.say(
@@ -93,7 +93,7 @@ export const commands: BaseCommandDefinitions = {
 
 	richpeople: {
 		command(target, room, user) {
-			if (!user.hasRank(room, "+") && !user.isDeveloper())
+			if (!user.isRoomauth(room) && !user.isDeveloper())
 				return user.say("Access Denied");
 			let db = currency.db;
 			let usersData = {};
