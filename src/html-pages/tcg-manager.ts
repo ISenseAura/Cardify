@@ -509,7 +509,7 @@ class TCGManager extends HtmlPageBase {
 							}, ${
 								deck.deck[deck.deck.length - 1].name
 							} and more! </i>`;
-							let onClick = `name="send" value="/msg cardify, /msgroom tcgtabletop, /pm cardify, ${Config.commandCharacter}viewdeck, view, ${d}"`;
+							let onClick = `name="send" value="/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}viewdeck, view, ${d}"`;
 							html += `<button ${onClick} style="background: #282a45; color: inherit; border: 1px solid white; padding: 0; font: inherit; cursor: pointer; border-radius: 10px; outline: inherit; width: 100%; overflow: hidden; position: relative; color: white; font-family: Arial, sans-serif; margin: 2px 0; " > <div style=" background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3jLYNLuYwPs1suOGNkzsJpLZ-KgNeyLWF_g&usqp=CAU') center/cover no-repeat; filter: blur(1px); position: relative; text-align: center; height: 60px; transform: rotate(3deg); transform: scale(1.1); " > <div style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(40, 42, 69, 0.6); " ></div> </div> <div style=" position: absolute; top: 0; left: 0; z-index: 10; text-align: left; padding: 15px; " > <p style="color: white; margin: 0; font-weight: 700; font-size: 16px"> ${title} </p> <p style=" color: #c9c9c9; margin: 0; background: none; font-weight: 500; font-size: 12px; " > ${subtitle} </p>  </div></button>`;
 						});
 					}
