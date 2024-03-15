@@ -28,7 +28,7 @@ const FOOTER_SELECTOR = 'page-footer';
 const EXPIRE_SELECTOR = 'page-expire-message';
 const EXPIRE_MESSAGE = "<h1>The page has expired!</h1><hr />";
 const EMPTY_SELECTOR_CONTENT = "<div></div>";
-const EXPIRATION_TIMEOUT_SECONDS = 30 * 60 * 1000;
+const EXPIRATION_TIMEOUT_SECONDS = 4 * 60 * 60 * 1000;
 
 export class HtmlSelector {
 	childSelectors: HtmlSelector[] | undefined;

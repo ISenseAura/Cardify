@@ -28,19 +28,19 @@ const chooseShop = "chooseshop";
 const chooseCollection = "choosecards";
 const collectionPageCommand = "collectionpage";
 
-// Shop handlers
+// Shop commands
 
 const chooseDeckShop = "choosedeckshop";
 const choosePackShop = "choosepackshop";
 const chooseFreeShop = "choosefreeshop";
 const buyItem = "buyitem";
 
-// Deck Handlers
+// Deck commands
 
 const importDeckInputCommand = "importdeck";
 const searchUserForChallengeCommand = "searchuser";
 
-// Play Handlers
+// Play commands
 const chooseDeckForBattle = "choosedeckforbattle";
 const chooseFormatForBattle = "chooseformatforbattle";
 const chooseFriendlyBattle = "choosefriendlybattle";
@@ -94,7 +94,7 @@ class TCGManager extends HtmlPageBase {
 			{
 				elements: [],
 				elementsPerRow: 2,
-				rowsPerPage: 8,
+				rowsPerPage: 10,
 				pagesLabel: "Collection",
 				noElementsLabel: "No more cards to list",
 				hideSinglePageNavigation: true,
@@ -308,6 +308,7 @@ class TCGManager extends HtmlPageBase {
 				this.send();
 			})
 			.catch((e) => {
+				console.log(e);
 				this.deckImportingStatus = e.message;
 				this.send();
 			});
@@ -354,6 +355,9 @@ class TCGManager extends HtmlPageBase {
 	setUserForChallenge(input: string) {
 		if (input.trim() == "") {
 			this.challengeTo = Tools.toId(input);
+			this.selectedDeck = "";
+			this.selectedFormat = ""
+		
 			this.send();
 			return;
 		}
@@ -371,6 +375,7 @@ class TCGManager extends HtmlPageBase {
 	challengeUser() {
 		let from = Users.get(this.userId);
 		let to = Users.get(this.challengeTo);
+		//console.log(to);
 		try {
 		let a = Battles.challenge(from,to,this.selectedFormat);
 		if(a) {

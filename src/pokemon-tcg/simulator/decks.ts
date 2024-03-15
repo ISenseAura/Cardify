@@ -71,6 +71,7 @@ class _Decks {
 				return this.db[id];
 			})
 			.catch((e) => {
+				
 				throw new Error(e);
 			});
 	}
@@ -88,7 +89,20 @@ class _Decks {
 		let finalDeck = [];
 
 		for await (let a of deck.cards ? deck.cards : deck) {
-			let card = await pokemon.card.find(a.id);
+			console.log(a)
+
+			let card;
+			try {
+			card = await pokemon.card.find(a.id);
+			} catch (e) {
+				try {
+				card = await pokemon.card.find(a.id2);
+				} catch (e) {
+					throw e;
+				}
+			}
+
+			a.id = card.id;
 			if (!card) throw new Error(`Card not found (ID : ${a.id})`);
 			card.count = a.count;
 			card.ID = card.id; // due to my lazy ass
@@ -170,9 +184,13 @@ class _Decks {
 						q: `ptcgoCode:${ptcgoCode?.toLowerCase().trim()}`,
 					});
 					let cardID = set[0].id + "-" + num;
+					let id2 = "";
+
+					if(set[1]) id2 = set[1].id + "-" + num;
 
 					let card = {
 						id: cardID,
+						id2:id2,
 						count: count,
 						name: name,
 						ptcgoCode: ptcgoCode,
