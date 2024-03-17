@@ -353,10 +353,25 @@ class TCGManager extends HtmlPageBase {
 	}
 
 	setUserForChallenge(input: string) {
+
+		if(input.trim() == "cancel") {
+
+			Battles.cancelChallenge(Users.get(this.userId),Users.get(this.challengeTo));
+
+			this.challengeTo = "";
+			this.selectedDeck = "";
+			this.selectedFormat = ""
+			this.isChallenging = false;
+
+			this.send();
+			return;
+		}
+
 		if (input.trim() == "") {
 			this.challengeTo = Tools.toId(input);
 			this.selectedDeck = "";
 			this.selectedFormat = ""
+			this.isChallenging = false;
 		
 			this.send();
 			return;
@@ -369,7 +384,13 @@ class TCGManager extends HtmlPageBase {
 		)
 			return;
 		this.challengeTo = Tools.toId(input);
+		this.erroMsg = "";
 		this.send();
+	}
+
+	rejectChallenge(to:string) {
+		this.erroMsg = "Challenge was rejected";
+		this.setUserForChallenge("")
 	}
 
 	challengeUser() {
@@ -377,7 +398,7 @@ class TCGManager extends HtmlPageBase {
 		let to = Users.get(this.challengeTo);
 		//console.log(to);
 		try {
-		let a = Battles.challenge(from,to,this.selectedFormat);
+		let a = Battles.challenge(from,to,this.selectedFormat,this.selectedDeck,pages[from.id]);
 		if(a) {
 			this.isChallenging =  true;
 			this.send();
@@ -467,15 +488,7 @@ class TCGManager extends HtmlPageBase {
 					html += `Cardify is a bot developed for the <a href="/tcgtabletop"> TCG & Tabletop </a> room by <span class="username"> <username> Pokem9n </username></span> (a.k.a P9). The bot will be responsible for simulating Pokemon TCG in the chatroom, managing cards, ladders and more! <br><br> As this is the initial phase of the bot, most of the features mentioned are not done implementing, We are working on it and we will notify you in the chatroom when new features are added. <br>`;
 					html += `</div>`;
 
-					html += `<br><strong style='font-size:16px;'> Features </strong> <br> <br>`;
-					html += `<div style='margin-left:10px;'>`;
-					html += `The main feature of this bot, that is the TCG Simulator is gonna take a while to be available for beta testing. We might release the beta version on 22nd March but we dont promise anything. <br><br> The Shop, Ladder, Deck Builder and Play will be implemented after the simulator is live. Our first priority is to launch the TCG Simulator ASAP. <br><br> As of now, The bot currently has a few helpful and fun commands that are listed below - <br><br>`;
-					html += `<div style='margin-left:14px;line-height:21px;'>`;
-					html += `<code>.rcard</code> Shows a random pokemon card (Requires : +,%,@,#) <br>`;
-					html += `<code>.gdeck QUERY</code> generates a sample deck based on your query (Requires : +,%,@,#) <br>`;
-
-					html += `</div>`;
-					html += `</div>`;
+					html += Config.roomIntro.tcgtabletop;
 				}
 				break;
 
@@ -665,7 +678,18 @@ class TCGManager extends HtmlPageBase {
 						case "friendlybattleview":
 							{
 								if(this.isChallenging) {
-									html += `<br><h3> You are challenging ${this.challengeTo}! <br> What happens next will be implemented in a couple of days :D </h3>`
+									html += `<br><h3> You are challenging <span class="username"> ${this.challengeTo} </span>!`
+									html +=
+									"&nbsp;&nbsp;" +
+									this.getQuietPmButton(
+										this.commandPrefix +
+											", " +
+											searchUserForChallengeCommand +
+											"," +
+											"cancel",
+										"Cancel"
+									);
+									html += `<br> What happens next will be implemented in a couple of days :D </h3>`
 								}
 								else if (!this.challengeTo.length) {
 									html += `<h3> Who do you wanna play with? </h3> `;
@@ -738,7 +762,7 @@ class TCGManager extends HtmlPageBase {
 									if (player.decks.length > 10)
 										html += `</details>`;
 
-										let challengeCmd = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, +tcg, ${challengeUserCmd},${this.selectedFormat},${this.selectedDeck}`;
+										let challengeCmd = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}tcg, ${challengeUserCmd},${this.selectedFormat},${this.selectedDeck}`;
 									html += `<button class="button mainmenu1" name="send" value="${challengeCmd}" style="font-size:19px;padding:11px;position:absolute;top:320px;right:40px;text-shadow: 0 -1px 0 #0f1924;" ${(this.selectedDeck.length > 1 && this.selectedFormat.length > 1) ? "" : "disabled" }> Challenge! </button>`;
 								}
 							}
@@ -818,6 +842,8 @@ export const commands: BaseCommandDefinitions = {
 			}else if (cmd === challengeUserCmd) {
 				console.log(cmd + "|" + targets)
 				pages[user.id].challengeUser();
+			}else if (cmd === "rejectchallenge") {
+				pages[user.id].rejectChallenge(targets[0].trim());
 			} else if (cmd === buyItem) {
 				let opts = targets[0].trim().split("|");
 				pages[user.id].buyItem(user, opts[0], opts[1]);
@@ -830,6 +856,11 @@ export const commands: BaseCommandDefinitions = {
 					targets[0].trim() == ""
 				)
 					return pages[user.id].setUserForChallenge("");
+				if (
+						cmd == searchUserForChallengeCommand &&
+						targets[0].trim() == "cancel"
+					)
+						return pages[user.id].setUserForChallenge("cancel");
 				const error = pages[user.id].checkComponentCommands(
 					cmd,
 					targets

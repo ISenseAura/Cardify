@@ -126,15 +126,23 @@ export class Battle extends EventEmitter{
 	sendBoard(turn?: number) {}
 }
 
+
+
+
+
+
 class _Battles {
 	battles: Record<string, Battle>;
 	mainRoom: Room | undefined;
 	challengesCount:Record<string,number>;
 
+	challenges:Record<string,any>
+
 	constructor() {
 		this.battles = {};
 		this.mainRoom = Rooms.get(Config.mainTCGRoom ? Config.mainTCGRoom : "tcgtabletop")
 		this.challengesCount = {}
+		this.challenges = {};
 	}
 
 	new(p1:Player,p2:Player,format:string = "standard",ranked?:boolean) {
@@ -152,18 +160,74 @@ class _Battles {
 		}
 	}
 
-	challenge(from:User,to:User,format = "standard") {
+	challenge(from:User,to:User,format = "standard",deck:string,page:any) {
 		if(!from || !to) return false;
 		if(this.challengesCount[from.id] > 3 && from.id != "pokem9n") return from.say("Due to spam reasons, you are allowed to challenge 3 times only during beta testing.")
 		if(!this.mainRoom?.canSendToUser(to)) throw new Error("Target User is not in the TCG room")
 		this.mainRoom.notifyUser(to,`[TCG-${format}] Challenge from ${from.name}`);
 
 		let challengeHtml = `<div class="highlighted" style="padding:5px;"><b> [Battle!]  Challenge from <span class="username"><username> ${from.name} </username></span> :  ${format} </b>`;
-		challengeHtml += ` <button name="send" value="/htmlbox <strong> The rest will be implemented soon :D </strong>"> Accept </button> | <button> Reject </button></div>`
-	    this.mainRoom.sayPrivateHtml(to,challengeHtml)
+
+		let rejectCmd = `/botmsg cardify, ${Config.commandCharacter}rejectchallenge ${from.id}`;
+		challengeHtml += ` <button name="send" value="/htmlbox <strong> The rest will be implemented soon :D </strong>"> Accept </button> | <button name="send" value="${rejectCmd}"> Reject </button></div>`
+	    this.mainRoom.sayPrivateUhtml(to,from.id,challengeHtml)
+		if(this.challenges[from.id]) throw new Error(`You are already challenging ${this.challenges[from.id].to}. Cancel that challenge first to start a new`)
+		this.challenges[from.id] = {to:to.id,format,date:(new Date()).getTime(),deck:deck, page:page};
+
+		/*
+		if(!this.challenges[from.id].includes(to.id)) this.challenges[from.id].push(to.id);
 		if(!this.challengesCount[from.id]) this.challengesCount[from.id] = 0;
+		*/
 		this.challengesCount[from.id] += 1;
 		return true;
+	}
+
+	acceptChallenge(from:User,to:User) {
+	
+		if(!this.challenges[from.id]) throw new Error("This user is not challenging you");
+		if(this.challenges[from.id].to !== to.id) throw new Error("This user is not challenging you");
+
+		let page = this.challenges[from.id].page;
+
+		page.acceptChallenge();
+		let challengeHtml = `<div class="highlighted" style="padding:5px;"><b> [Battle!]  Challenge from <span class="username"><username> ${from.name} </username></span> was rejected </b></div>`;
+		this.mainRoom?.sayPrivateUhtmlChange(to,from.id,challengeHtml)
+		delete this.challenges[from.id];
+
+
+	}
+
+	rejectChallenge(from:User,to:User) {
+	
+		if(!this.challenges[from.id]) throw new Error("This user is not challenging you");
+		if(this.challenges[from.id].to !== to.id) throw new Error("This user is not challenging you");
+
+		let page = this.challenges[from.id].page;
+
+		page.rejectChallenge();
+		let challengeHtml = `<div class="highlighted" style="padding:5px;"><b> [Battle!]  Challenge from <span class="username"><username> ${from.name} </username></span> was rejected </b></div>`;
+		this.mainRoom?.sayPrivateUhtmlChange(to,from.id,challengeHtml)
+		delete this.challenges[from.id];
+
+
+	}
+
+	cancelChallenge(from:User | any,to:User) {
+		if(!to) return;
+		if(!this.challenges[from.id]) throw Error("You are not challenging anyone");
+		if(this.challenges[from.id].to != to.id) throw Error("You are not challenging this user");
+		delete this.challenges[from.id];
+
+		let challengeHtml = `<div class="highlighted" style="padding:5px;"><b> [Battle!]  Challenge from <span class="username"><username> ${from.name} </username></span> was cancelled </b></div>`;
+		this.mainRoom?.sayPrivateUhtmlChange(to,from.id,challengeHtml)
+
+	}
+
+	resetUser(user:string) {
+		if(!this.challenges[user]) return;
+		let to = Users.get(this.challenges[user].to);
+		if(!to) return delete this.challenges[user];
+		this.cancelChallenge({id:user},to)
 	}
 }
 

@@ -12,6 +12,8 @@ import pokemon from "pokemontcgsdk"
 
 import Simulator from './src/simulator';
 import { Battle } from '../pokemon-tcg/simulator/battle';
+import { Battles } from '../pokemon-tcg/simulator/battle';
+
 
 
 
@@ -42,5 +44,15 @@ export const commands: BaseCommandDefinitions = {
 
 
         },
+    },
+
+    rejectchallenge: {
+      command(target, room, user, alias, timestamp) {
+            if(!target) return;
+            let from = Users.get(Tools.toId(target));
+            if(!from) return;
+            Battles.rejectChallenge(from,user);
+        },
     }
+    
 }
