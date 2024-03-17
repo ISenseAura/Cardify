@@ -26,6 +26,7 @@ export const commands: BaseCommandDefinitions = {
 		command(target, room, user) {
 			// eslint-disable-line @typescript-eslint/no-unused-vars
             if (this.isPm()) return this.say("Cannot be used in a PM");
+            if(room.id != "tcgtabletop") return;
 			if (!user.isRoomauth(room) && !user.isDeveloper()) return room.sayPrivateHtml(
 					user,
 					"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
@@ -45,7 +46,7 @@ export const commands: BaseCommandDefinitions = {
 					room.sayUhtml("burnthecard" + gameCount, html);
 				});
 		},
-		aliases: ["btp"],
+		aliases: ["btp","btc","gtc"],
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
 	},
