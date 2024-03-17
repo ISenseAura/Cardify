@@ -46,7 +46,7 @@ export const commands: BaseCommandDefinitions = {
 					room.sayUhtml("burnthecard" + gameCount, html);
 				});
 		},
-		aliases: ["btp","btc","gtc"],
+		aliases: ["btp"],
 		syntax: ["[expression]"],
 		description: ["evaluates the given expression and displays the result"],
 	},
