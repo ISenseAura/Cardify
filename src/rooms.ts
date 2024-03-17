@@ -252,7 +252,7 @@ export class Room {
 			 this.onlineTime[user.id] = (new Date()).getTime();
 			 if(!currency.db[user.id]) currency.add(user,0,"Cardify","Initial Balance")
 		}
-		if(Config.roomIntro[this.id] && user.id == "pokem9n") {
+		if(Config.roomIntro[this.id]) {
 			this.sayPrivateUhtml(user,"roomintro",Config.roomIntro[this.id])
 		}
 	}
