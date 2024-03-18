@@ -19,7 +19,7 @@ import { Battles } from '../pokemon-tcg/simulator/battle';
 
 
 export const commands: BaseCommandDefinitions = {
-	battle: {
+	battletest: {
 	
 		command(target, room, user) { // eslint-disable-line @typescript-eslint/no-unused-vars
             let opts = target.split("|");
@@ -53,6 +53,15 @@ export const commands: BaseCommandDefinitions = {
             if(!from) return;
             Battles.rejectChallenge(from,user);
         },
+    },
+
+    acceptchallenge: {
+            command(target, room, user, alias, timestamp) {
+                  if(!target) return;
+                  let from = Users.get(Tools.toId(target));
+                  if(!from) return;
+                  Battles.acceptChallenge(from,user);
+              },
     }
     
 }

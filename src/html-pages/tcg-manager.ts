@@ -50,7 +50,7 @@ const challengeUserCmd = "challengeuser"
 export const pageId = "tcg-manager";
 export const pages: Dict<TCGManager> = {};
 
-class TCGManager extends HtmlPageBase {
+export class TCGManager extends HtmlPageBase {
 	pageId = pageId;
 	currentView:
 		| "intro"
