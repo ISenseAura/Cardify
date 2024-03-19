@@ -305,7 +305,7 @@ class Packs {
 					let i = sortCards.indexOf(card);
 					if (i < 0) sortCards.push(card);
 					if (i > -1) {
-						if (!sortCards[i].count) sortCards[i].count += 1;
+						if (!sortCards[i].count) sortCards[i].count = 0;
 						sortCards[i].count += 1;
 					}
 				});
