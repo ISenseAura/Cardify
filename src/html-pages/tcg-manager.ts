@@ -266,7 +266,7 @@ export class TCGManager extends HtmlPageBase {
 		const elements: IPageElement[] = [];
 
 		for (let i = 0; i < cards.length; i++) {
-			let html = `<li style=" background: url('${cards[i].large}') center/contain no-repeat; height: 290px; width: 290px; display: inline-block; margin: 0 0; " > <span style="background:black;border:2px solid white; color:white;border-radius:20px; padding:10px;position:relative;top:0px;left:0px;"> ${cards[i].count} </span> </li>`;
+			let html = `<li style=" background: url('${cards[i].large}') center/contain no-repeat; height: 290px; width: 290px; display: inline-block; margin: 0 0; " > <span style="background:black;border:2px solid white; color:white;border-radius:20px; padding:10px;position:relative;top:0px;left:0px;"> x${cards[i].count} </span> </li>`;
 
 			elements.push({ html: html });
 		}

@@ -309,6 +309,7 @@ class Packs {
 					console.log(i);
 					if (i < 0) {
 						sortCards.push(card.id);
+						card.count = 1;
 						nc.push(card);
 					}
 					if (i > -1) {
