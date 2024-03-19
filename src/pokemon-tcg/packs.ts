@@ -309,10 +309,11 @@ class Packs {
 					console.log(i);
 					if (i < 0) {
 						sortCards.push(card.id);
+						card.count = 1;
 						nc.push(card);
 					}
 					if (i > -1) {
-						if (!nc[i].count) nc[i].count = 0;
+						//if (!nc[i].count) nc[i].count = 0;
 						nc[i].count += 1;
 					}
 				});
