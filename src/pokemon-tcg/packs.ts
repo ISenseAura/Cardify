@@ -314,7 +314,7 @@ class Packs {
 					}
 				});
 			}
-			this.collection[p].cards = nc;
+			this.collection[user].cards = nc;
 		} else {
 			Object.keys(this.collection).forEach((p) => {
 				let sortCards = [];

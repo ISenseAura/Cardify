@@ -31,6 +31,12 @@ export class Battle extends EventEmitter{
 	p1: IPlayer;
 	p2: IPlayer;
 
+	p1client?:BattlePage
+	p2client?:BattlePage
+
+	spectactors?:Record<string,BattlePage>
+
+
 	title: string;
 	room: Room | undefined;
 
@@ -41,7 +47,11 @@ export class Battle extends EventEmitter{
 	constructor(data: any, room?: Room) {
 		super();
 		this.p1 = data.p1;
+		this.p1client = data.p1.page ? data.p1.page : null;
 		this.p2 = data.p2;
+		this.p2client = data.p2.page ? data.p2.page : null;
+
+
 		this.title = this.p1.name + " vs " + this.p2.name;
 
 		this.room = room ? room : Rooms.get("tcgtabletop");
@@ -177,7 +187,12 @@ class _Battles {
 		}
 	}
 
-	initiate(data:any) {
+	initiate(id:string,data:any) {
+		data.p1.page = this.pages[data.p1.id][id];
+		data.p2.page = this.pages[data.p2.id][id];
+
+		data.p1.page.updateInitData(data)
+		data.p2.page.updateInitData(data)
 
 	}
 

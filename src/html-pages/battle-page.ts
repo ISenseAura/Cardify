@@ -65,10 +65,16 @@ export class BattlePage extends HtmlPageBase {
 		this.setCloseButtonHtml();
 	}
 
+	updateInitData(data:any) {
+		this.initBattleData = data;
+		this.send();
+	}
+
 	selectDeck(id: string) {
 		let deck = Decks.get(id);
 		this.initBattleData[this.playerid].deck = deck;
 		this.initiated = true;
+		Battles.initiate(this.battleid,this.initBattleData);
 		this.send();
 	}
 
