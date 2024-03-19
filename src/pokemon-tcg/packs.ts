@@ -300,19 +300,24 @@ class Packs {
 		Object.keys(this.collection).forEach((p) => {
 			let sortCards = [];
 			let cards = this.collection[p].cards;
+
+			let nc = [];
+
 			if (cards) {
 				cards.forEach((card) => {
-					let i = sortCards.indexOf(card);
+					let i = sortCards.indexOf(card.id);
 					console.log(i);
-					if (i < 0) sortCards.push(card);
+					if (i < 0) {
+						sortCards.push(card.id);
+						nc.push(card);
+					}
 					if (i > -1) {
-						console.log(sortCards[i].count);
-						if (!sortCards[i].count) sortCards[i].count = 0;
-						sortCards[i].count += 1;
+						if (!nc[i].count) nc[i].count = 0;
+						nc[i].count += 1;
 					}
 				});
 			}
-			this.collection[p].cards = sortCards;
+			this.collection[p].cards = nc;
 		});
 		this.updateDatabase("collection");
 	}
