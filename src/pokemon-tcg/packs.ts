@@ -241,17 +241,12 @@ class Packs {
 		if (!db[user.id]) {
 			db[user.id] = { cards: [], packsOpened: [] };
 		}
-
 		pack.cards.forEach((card) => {
-			let i = db[user.id].cards.indexOf(card);
-			if (i < 0) db[user.id].cards.push(card);
-			if (i > -1) {
-				if (!db[user.id].cards[i].count) db[user.id].cards[i].count = 1;
-				db[user.id].cards[i].count += 1;
-			}
+			db[user.id].cards.push(card);
 		});
 		db[user.id].packsOpened.push(pack);
 
+		this.sortCollections(user.id);
 		this.updateDatabase("collection");
 	}
 
@@ -296,31 +291,56 @@ class Packs {
 		}
 	}
 
-	sortCollections() {
-		Object.keys(this.collection).forEach((p) => {
+	sortCollections(user?: string) {
+		if (user) {
+			if (!this.collection[user]) return;
+			let cards = this.collection[user].cards;
 			let sortCards = [];
-			let cards = this.collection[p].cards;
 
 			let nc = [];
 
 			if (cards) {
 				cards.forEach((card) => {
 					let i = sortCards.indexOf(card.id);
-					console.log(i);
+					//console.log(i);
 					if (i < 0) {
 						sortCards.push(card.id);
-						card.count = 1;
+						card.count = card.count ? card.count : 1;
 						nc.push(card);
 					}
 					if (i > -1) {
-						if (!nc[i].count) return nc[i].count = 1;
+						if (!nc[i].count) return (nc[i].count = 1);
 						nc[i].count += 1;
 					}
 				});
 			}
 			this.collection[p].cards = nc;
-		});
-		this.updateDatabase("collection");
+		} else {
+			Object.keys(this.collection).forEach((p) => {
+				let sortCards = [];
+				let cards = this.collection[p].cards;
+
+				let nc = [];
+
+				if (cards) {
+					cards.forEach((card) => {
+						let i = sortCards.indexOf(card.id);
+						//console.log(i);
+						if (i < 0) {
+							sortCards.push(card.id);
+							card.count = card.count ? card.count : 1;
+							nc.push(card);
+						}
+						if (i > -1) {
+							if (!nc[i].count) return (nc[i].count = 1);
+							nc[i].count += 1;
+						}
+					});
+				}
+				this.collection[p].cards = nc;
+			});
+			//this.updateDatabase("collection");
+		}
 	}
 }
 
