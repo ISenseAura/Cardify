@@ -303,8 +303,10 @@ class Packs {
 			if (cards) {
 				cards.forEach((card) => {
 					let i = sortCards.indexOf(card);
+					console.log(i);
 					if (i < 0) sortCards.push(card);
 					if (i > -1) {
+						console.log(sortCards[i].count);
 						if (!sortCards[i].count) sortCards[i].count = 0;
 						sortCards[i].count += 1;
 					}
