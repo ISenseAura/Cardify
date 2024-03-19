@@ -32,6 +32,8 @@ export class BattlePage extends HtmlPageBase {
 	initBattleData: any;
 	playerid: string;
 
+	logs:Array<string>
+
 	constructor(room: Room, user: User, battleid: string,challenge:any) {
 		super(room, user, baseCommand, pages);
 
@@ -52,26 +54,33 @@ export class BattlePage extends HtmlPageBase {
 			p1: {
 				id: challenge.from,
 				name: Users.get(challenge.from) ? Users.get(challenge.from).name : challenge.from,
-				deck: Decks.get(challenge.fromdeck)
+				deck: Decks.get(challenge.fromdeck).deck
 			},
 			p2: {
 				id: challenge.to,
 				name: Users.get(challenge.to) ? Users.get(challenge.to).name : challenge.to,
-				deck: challenge.todeck ? Decks.get(challenge.todeck) : null
+				deck: challenge.todeck ? Decks.get(challenge.todeck).deck : null
 			},
 			format: challenge.format,
 			battleId:battleid
 		}
+
+		this.logs = [];
 		this.setCloseButtonHtml();
+	}
+
+	log(line:string) {
+		this.logs.push(line.trim());
 	}
 
 	updateInitData(data:any) {
 		this.initBattleData = data;
+		this.initiated = true;
 		this.send();
 	}
 
 	selectDeck(id: string) {
-		let deck = Decks.get(id);
+		let deck = Decks.get(id).deck;
 		this.initBattleData[this.playerid].deck = deck;
 		this.initiated = true;
 		Battles.initiate(this.battleid,this.initBattleData);
@@ -126,6 +135,12 @@ export class BattlePage extends HtmlPageBase {
 			}
 			else {
 			html += board
+
+			html += `<br><div style="background:#36454F;border:2px solid white;color:white;padding:10px;>`;
+			this.logs.forEach((log) => {
+				html += `<span>${log}</span> <br>`
+			})
+			html += `</div>`
 			}
 
 		html += "</div>";
