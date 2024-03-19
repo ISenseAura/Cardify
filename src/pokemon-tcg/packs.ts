@@ -339,7 +339,7 @@ class Packs {
 				}
 				this.collection[p].cards = nc;
 			});
-			//this.updateDatabase("collection");
+			this.updateDatabase("collection");
 		}
 	}
 }
