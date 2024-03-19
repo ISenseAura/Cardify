@@ -14,12 +14,12 @@ import path = require("path");
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 
- class Packs {
+class Packs {
 	private rarities: Array<string>;
 	private slot1: Record<string, number>;
 	private slot2: Record<string, number>;
 	private dir: string;
-	 daily: any;
+	daily: any;
 	private collection: any;
 
 	constructor() {
@@ -48,7 +48,11 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 			"Rare Ultra",
 			"Uncommon",
 		];
-		this.slot1 = { "rarity:rare rarity:holo -rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 16, "rarity:prism rarity:star": 16, "rarity:amazing rarity:rare": 8 };
+		this.slot1 = {
+			"rarity:rare rarity:holo -rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 16,
+			"rarity:prism rarity:star": 16,
+			"rarity:amazing rarity:rare": 8,
+		};
 		this.slot2 = {
 			"!rarity:rare": 32,
 			"rarity:rare rarity:holo -rarity:v -rarity:ex -rarity:gx -rarity:vmax -rarity:ultra": 8,
@@ -61,7 +65,7 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 			"rarity:rare rarity:secret": 2,
 		};
 
-		this.dir = path.join(Tools.rootFolder, 'databases');;
+		this.dir = path.join(Tools.rootFolder, "databases");
 
 		if (!fs.existsSync(this.dir + "daily.json")) {
 			fs.writeFileSync(this.dir + "daily.json", JSON.stringify({}));
@@ -77,6 +81,8 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 		this.collection = JSON.parse(
 			fs.readFileSync(this.dir + "/collection.json").toString()
 		);
+
+		this.sortCollections();
 	}
 
 	getSlots(): Array<string> {
@@ -100,14 +106,11 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 		return [slot1, slot2];
 	}
 
-	async randomPack(id: string,source?:string) {
+	async randomPack(id: string, source?: string) {
 		let slots = this.getSlots();
 
 		let slot1 = slots[0];
 		let slot2 = slots[1];
-
-	
-
 
 		let slot1Card;
 		let slot2Card;
@@ -115,16 +118,17 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 
 		let cards = [];
 
-		console.log(id)
+		console.log(id);
 
 		let rs1 = await pokemon.card.all({ q: `set.id:${id} ${slot1}` });
-	//	if(!rs1.length) rs1 = await pokemon.card.all({ q: `set.id:${id} !rarity:rare` });
-		if(!rs1.length) rs1 = await pokemon.card.all({ q: `set.id:${id} rarity:rare` });
+		//	if(!rs1.length) rs1 = await pokemon.card.all({ q: `set.id:${id} !rarity:rare` });
+		if (!rs1.length)
+			rs1 = await pokemon.card.all({ q: `set.id:${id} rarity:rare` });
 
 		console.log(rs1);
-		let aa = Tools.sampleMany(rs1,2);
-		slot1Card = aa[1]
-		slot3Card = aa[0]
+		let aa = Tools.sampleMany(rs1, 2);
+		slot1Card = aa[1];
+		slot3Card = aa[0];
 
 		let c6 = {
 			id: slot1Card.id,
@@ -135,9 +139,9 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 		};
 
 		let rs2 = await pokemon.card.all({ q: `set.id:${id} ${slot2}` });
-		if(!rs2.length) rs2 = rs1
+		if (!rs2.length) rs2 = rs1;
 
-		console.log(rs2.length)
+		console.log(rs2.length);
 
 		let cm = await pokemon.card.all({ q: `set.id:${id} rarity:common` });
 
@@ -149,12 +153,12 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 			q: `set.id:${id} supertype:energy subtypes:basic`,
 		});
 
+		if (!en.length)
+			en = await pokemon.card.all({
+				q: `set.id:${"sm1"} supertype:energy -name:Fairy subtypes:basic`,
+			});
 
-		if(!en.length) en = await pokemon.card.all({
-			q: `set.id:${"sm1"} supertype:energy -name:Fairy subtypes:basic`,
-		});
-
-		console.log(en.length)
+		console.log(en.length);
 		Tools.sampleMany(cm, 4).forEach((a, i) => {
 			cards[i] = {
 				id: a.id,
@@ -239,15 +243,19 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 		}
 
 		pack.cards.forEach((card) => {
-			db[user.id].cards.push(card);
-			db[user.id].packsOpened.push(pack);
+			let i = db[user.id].cards.indexOf(card);
+			if (i < 0) db[user.id].cards.push(card);
+			if (i > -1) {
+				if (!db[user.id].cards[i].count) db[user.id].cards[i].count = 1;
+				db[user.id].cards[i].count += 1;
+			}
 		});
+		db[user.id].packsOpened.push(pack);
 
 		this.updateDatabase("collection");
 	}
 
-
-	canOpenDaily(user:User) {
+	canOpenDaily(user: User) {
 		let db = this.daily;
 		let ms24hr = 60 * 60 * 24 * 1000;
 		if (db[user.id]) {
@@ -259,12 +267,12 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 		return true;
 	}
 
-	async openDaily(user: User, packid: any,source?:string) {
+	async openDaily(user: User, packid: any, source?: string) {
 		let db = this.daily;
 		let ms24hr = 60 * 60 * 24 * 1000;
 
-		if(source) {
-			let pack = await this.randomPack(packid,source);
+		if (source) {
+			let pack = await this.randomPack(packid, source);
 			this.addPack(user, pack);
 			return pack;
 		}
@@ -286,6 +294,25 @@ pokemon.configure({ apiKey: "211cfd2c-7f19-49de-a9f1-9945ad4a7215" });
 			this.updateDatabase("daily");
 			return pack;
 		}
+	}
+
+	sortCollections() {
+		Object.keys(this.collection).forEach((p) => {
+			let sortCards = [];
+			let cards = this.collection[p].cards;
+			if (cards) {
+				cards.forEach((card) => {
+					let i = sortCards.indexOf(card);
+					if (i < 0) sortCards.push(card);
+					if (i > -1) {
+						if (!sortCards[i].count) sortCards[i].count += 1;
+						sortCards[i].count += 1;
+					}
+				});
+			}
+			this.collection[p].cards = sortCards;
+		});
+		this.updateDatabase("collection");
 	}
 }
 
