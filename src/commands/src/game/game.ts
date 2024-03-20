@@ -345,7 +345,6 @@ export  class Game extends EventEmitter implements GameEvents {
     let cards = [];
     for (let i = player.hand.length - 1; i >= player.hand.length - num; i--) {
       cards.push(player.hand[i]);
-      console.log(player.deck.getCard(player.hand[i]))
       if (player.deck.getCard(player.hand[i]).isBasic)
         player.basicCards.push(player.hand[i]);
     }
@@ -364,7 +363,6 @@ export  class Game extends EventEmitter implements GameEvents {
 
   reDrawHand(p: PlayerID) {
     let player = this[p];
-    console.log(player.hand);
     player.hand.forEach((id: any) => {
       player.putToDeck(id);
     });

@@ -48,6 +48,9 @@ class DeckViewer extends HtmlPageBase {
 		html += "<br /><br />";
 
 		html += `<h3> Viewing Deck ${this.deckId} </h3>`;
+		let deleteDeckCommand = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${this.commandPrefix}, deletedeck, ${d}`;
+
+		//html += `<button name="send" value="${deleteDeckCommand}"> Delete </button> <br> `
 
 		let deck = Decks.get(this.deckId);
 		html += `<ul style="margin: 3px; padding: 0; display: table">`;
@@ -81,6 +84,11 @@ export const commands: BaseCommandDefinitions = {
 							user,
 							Tools.toId(targets[0])
 						).open();
+					}
+					break;
+
+					case "delete": {
+						Decks.delete(targets[0]);
 					}
 					break;
 			}

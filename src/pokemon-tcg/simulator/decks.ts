@@ -11,6 +11,27 @@ import path = require("path");
 global.fetch = (url: RequestInfo, init?: RequestInit) =>
 	import("node-fetch").then(({ default: fetch2 }) => fetch2(url, init));
 
+export class BattleDeck {
+	cards: Dict<any>;
+	initDeck: Array<any>;
+
+	constructor(deck: Array<any>) {
+		this.initDeck = deck;
+
+		this.cards = {};
+
+		this.initDeck.forEach((card) => {
+			if (card.id) {
+				this.cards[card.id] = card;
+			}
+		});
+	}
+
+	get(id: string) {
+		return this.cards[id.trim()];
+	}
+}
+
 class _Decks {
 	standardBlocks: Array<String>;
 	db: any;
@@ -35,11 +56,11 @@ class _Decks {
 		}
 	}
 
-	delete(id:string) {
-		if(this.db[id]) return;
+	delete(id: string) {
+		if (!this.db[id]) return;
 		let player = Players.get(this.db[id].user);
-		if(player) {
-			Players.removeDeck(player.id,id);
+		if (player) {
+			Players.removeDeck(player.id, id);
 		}
 		delete this.db[id];
 		this.update();
@@ -50,7 +71,7 @@ class _Decks {
 		if (!player) player = Players.add(user);
 		let finalName = name
 			? user.id + "-" + name
-			: user.id + "-" + "Deck#" + (player.decks.length + 1);
+			: user.id + "-" + "Deck#" + (player.decks.length + Tools.random(100));
 		let id = Tools.toId(finalName);
 		if (this.db[id])
 			throw new Error(
@@ -67,16 +88,15 @@ class _Decks {
 				};
 				this.db[id] = info;
 				this.update();
-				Players.addDeck(user.id,id);
+				Players.addDeck(user.id, id);
 				return this.db[id];
 			})
 			.catch((e) => {
-				
 				throw new Error(e);
 			});
 	}
 
-	get(id:string) {
+	get(id: string) {
 		return this.db[id];
 	}
 
@@ -89,14 +109,14 @@ class _Decks {
 		let finalDeck = [];
 
 		for await (let a of deck.cards ? deck.cards : deck) {
-			console.log(a)
+			console.log(a);
 
 			let card;
 			try {
-			card = await pokemon.card.find(a.id);
+				card = await pokemon.card.find(a.id);
 			} catch (e) {
 				try {
-				card = await pokemon.card.find(a.id2);
+					card = await pokemon.card.find(a.id2);
 				} catch (e) {
 					throw e;
 				}
@@ -186,11 +206,11 @@ class _Decks {
 					let cardID = set[0].id + "-" + num;
 					let id2 = "";
 
-					if(set[1]) id2 = set[1].id + "-" + num;
+					if (set[1]) id2 = set[1].id + "-" + num;
 
 					let card = {
 						id: cardID,
-						id2:id2,
+						id2: id2,
 						count: count,
 						name: name,
 						ptcgoCode: ptcgoCode,

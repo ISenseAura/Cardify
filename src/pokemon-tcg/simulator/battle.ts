@@ -25,7 +25,7 @@ interface IChallenge {
 	date: any;
 }
 
-export class Battle extends EventEmitter {
+export class Battle {
 	battleId: string;
 
 	p1: IPlayer;
@@ -44,7 +44,6 @@ export class Battle extends EventEmitter {
 	game: any;
 
 	constructor(data: any, clients?: any, room?: Room) {
-		super();
 		this.p1 = data.p1;
 		this.p1client = clients.p1 ? clients.p1 : null;
 		this.p2 = data.p2;
@@ -97,6 +96,9 @@ export class Battle extends EventEmitter {
 			case "init":
 				{
 					this.game = JSON.parse(other[0]);
+					this.p1client?.boardInit(this.game)
+					this.p2client?.boardInit(this.game)
+
 				}
 				break;
 
@@ -104,6 +106,9 @@ export class Battle extends EventEmitter {
 				{
 					let upOf = other[0];
 					let up = other[1];
+					this.p1client?.boardUpdate(JSON.parse(up),upOf == "p1")
+					this.p2client?.boardUpdate(JSON.parse(up),upOf == "p2")
+
 					this.game[upOf] = JSON.parse(up);
 				
 				}
@@ -152,14 +157,17 @@ export class Battle extends EventEmitter {
 	sendBoard(turn?: number) {}
 
 	broadcast(msg: string, player?: string) {
+		console.log(`[Broadcast] ${player} - ${msg}`);
 		switch (player) {
 			case "p1":
 				{
+					//console.log(msg)
 					this.p1client.log(msg);
 				}
 				break;
 			case "p2":
 				{
+					//console.log(msg)
 					this.p2client.log(msg);
 				}
 				break;

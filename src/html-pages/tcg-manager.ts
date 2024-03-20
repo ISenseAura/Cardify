@@ -39,6 +39,7 @@ const buyItem = "buyitem";
 
 const importDeckInputCommand = "importdeck";
 const searchUserForChallengeCommand = "searchuser";
+const deleteDeck = "deletedeck"
 
 // Play commands
 const chooseDeckForBattle = "choosedeckforbattle";
@@ -328,6 +329,12 @@ export class TCGManager extends HtmlPageBase {
 		this.clearImportDeckInput();
 	}
 
+	deleteDeck(id:string) {
+		Decks.delete(id.trim());
+		console.log("test")
+		this.send();
+	}
+
 	// @Play-Hanlders
 
 	chooseFriendlyBattle() {
@@ -523,7 +530,9 @@ export class TCGManager extends HtmlPageBase {
 								deck.deck[deck.deck.length - 1].name
 							} and more! </i>`;
 							let onClick = `name="send" value="/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}viewdeck, view, ${d}"`;
-							html += `<button ${onClick} style="background: #282a45; color: inherit; border: 1px solid white; padding: 0; font: inherit; cursor: pointer; border-radius: 10px; outline: inherit; width: 100%; overflow: hidden; position: relative; color: white; font-family: Arial, sans-serif; margin: 2px 0; " > <div style=" background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3jLYNLuYwPs1suOGNkzsJpLZ-KgNeyLWF_g&usqp=CAU') center/cover no-repeat; filter: blur(1px); position: relative; text-align: center; height: 60px; transform: rotate(3deg); transform: scale(1.1); " > <div style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(40, 42, 69, 0.6); " ></div> </div> <div style=" position: absolute; top: 0; left: 0; z-index: 10; text-align: left; padding: 15px; " > <p style="color: white; margin: 0; font-weight: 700; font-size: 16px"> ${title} </p> <p style=" color: #c9c9c9; margin: 0; background: none; font-weight: 500; font-size: 12px; " > ${subtitle} </p>  </div></button>`;
+							let deleteDeckCommand = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${this.commandPrefix}, deletedeck, ${d}`;
+							
+							html += `<button name="send" value="${deleteDeckCommand}"> Delete </button> <br><button ${onClick} style="background: #282a45; color: inherit; border: 1px solid white; padding: 0; font: inherit; cursor: pointer; border-radius: 10px; outline: inherit; width: 100%; overflow: hidden; position: relative; color: white; font-family: Arial, sans-serif; margin: 2px 0; " > <div style=" background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3jLYNLuYwPs1suOGNkzsJpLZ-KgNeyLWF_g&usqp=CAU') center/cover no-repeat; filter: blur(1px); position: relative; text-align: center; height: 60px; transform: rotate(3deg); transform: scale(1.1); " > <div style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(40, 42, 69, 0.6); " ></div> </div> <div style=" position: absolute; top: 0; left: 0; z-index: 10; text-align: left; padding: 15px; " > <p style="color: white; margin: 0; font-weight: 700; font-size: 16px"> ${title} </p> <p style=" color: #c9c9c9; margin: 0; background: none; font-weight: 500; font-size: 12px; " > ${subtitle} </p>  </div></button><br>`;
 						});
 					}
 					html += `</div>`;
@@ -812,6 +821,7 @@ export const commands: BaseCommandDefinitions = {
 			if (!(user.id in pages) && cmd !== CLOSE_COMMAND)
 				new TCGManager(botRoom, user);
 
+				console.log(cmd + "-" + targets)
 			if (cmd === chooseIntro) {
 				pages[user.id].chooseIntro();
 			} else if (cmd === chooseCollection) {
@@ -836,6 +846,8 @@ export const commands: BaseCommandDefinitions = {
 				pages[user.id].chooseRankBattle();
 			}else if (cmd === chooseDeckForBattle) {
 				pages[user.id].chooseDeckForBattle(targets[0].trim());
+			}else if (cmd === deleteDeck) {
+				pages[user.id].deleteDeck(targets[0].trim());
 			}else if (cmd === chooseFormatForBattle) {
 				console.log(cmd + "|" + targets)
 				pages[user.id].chooseFormatForBattle(targets[0].trim());
