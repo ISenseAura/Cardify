@@ -48,7 +48,7 @@ class DeckViewer extends HtmlPageBase {
 		html += "<br /><br />";
 
 		html += `<h3> Viewing Deck ${this.deckId} </h3>`;
-		let deleteDeckCommand = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${this.commandPrefix}, deletedeck, ${d}`;
+	//	let deleteDeckCommand = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${this.commandPrefix}, deletedeck, ${d}`;
 
 		//html += `<button name="send" value="${deleteDeckCommand}"> Delete </button> <br> `
 
