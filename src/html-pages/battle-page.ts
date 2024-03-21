@@ -77,10 +77,11 @@ export class BattlePage extends HtmlPageBase {
 			battleId: battleid,
 		};
 
+		console.log(this.initBattleData);
 		this.decks = {};
 
 		this.decks.me = this.initBattleData.p1.deck ? new BattleDeck(this.initBattleData.p1.deck) : null;
-		this.decks.opponent = this.initBattleData.p1.deck ? new BattleDeck(this.initBattleData.p2.deck) : null;
+		this.decks.opponent = this.initBattleData.p2.deck ? new BattleDeck(this.initBattleData.p2.deck) : null;
 
 		let userid = this.userId;
 		let playerid = this.playerid;
