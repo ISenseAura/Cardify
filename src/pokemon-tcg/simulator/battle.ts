@@ -193,7 +193,7 @@ class _Battles {
 		this.mainRoom = Rooms.get(
 			Config.mainTCGRoom
 				? Config.mainTCGRoom
-				: "groupchat-tcgtabletop-gametest"
+				: "tcgtabletop"
 		);
 		this.challengesCount = {};
 		this.challenges = {};
