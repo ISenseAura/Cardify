@@ -50,19 +50,36 @@ export class Move implements MoveEntity {
 
 export abstract class Card {
   public ID: string;
+  public id:string;
   public supertype: Supertype;
   public name: string;
   public multiUses: boolean;
   public cardtype: string;
   public count: number;
 
+  public supertypes: Array<string>
+  public subtypes: Array<string>
+  public types: any;
+
+
+  public images:any;
+  public regulationMark: any;
+
   constructor(data: any) {
     this.ID = data.ID ? data.ID : data.id;
+    this.id = this.ID
     this.name = data.name;
     this.supertype = data.supertype;
     this.multiUses = data.multiUses ? data.multiUses : false;
     this.cardtype = data.supertype;
     this.count = data.count ? data.count : 1;
+
+    this.supertypes = data.supertypes;
+    this.subtypes = data.subtypes;
+    this.types = data.types;
+
+    this.images = data.images;
+    this.regulationMark = data.regulationMark;
   }
 }
 

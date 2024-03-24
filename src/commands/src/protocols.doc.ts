@@ -28,6 +28,8 @@
  |all|init|JSON(GameData)
  |p1|action|choose|activepokemon
  |p1|action|choices|bench,attachenergy,usecard,pass|GAME_DATA
+ |p1|message|timestamp|message
+
 
 
 

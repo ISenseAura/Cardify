@@ -199,7 +199,8 @@ export class Simulator extends ObjectReadWriteStream<string>{
   }
 
   handleCustomMessage(data: any) {
-   // console.log(data);
+   let to = data.to;
+   this._write(`|${to}|message|${new Date().getTime()}|${data.msg}`)
   }
 
   handlePMError(data: any) {
@@ -255,7 +256,7 @@ export class Simulator extends ObjectReadWriteStream<string>{
     let gamedata = data.data;
     let msg = `|all|start|${JSON.stringify(gamedata)}`
     this._write(msg);
-    this._write(`|all|message|${p} was randomly choosen to move first`);
+    this._write(`|all|message|${new Date().getTime()}|${p} was randomly choosen to move first`);
     }
 
   handleTurnUpdate(data: any) {

@@ -151,7 +151,7 @@ export  class Game extends EventEmitter implements GameEvents {
     if (!this.p1 || !this.p2) this.error("Players not initialized");
     // this.updatePlayer();
 
-    this.emit("initiated", this.getUpdate());
+    this.emit("initiated", this.getUpdate({deck:true}));
 
     this.send("The Game has started!");
 
@@ -606,12 +606,16 @@ export  class Game extends EventEmitter implements GameEvents {
     this.emit("turnupdate", sendData);
   }
 
-  getUpdate() {
+  getUpdate(options?) {
     let gameData: any = {};
     gameData.id = this.ID;
     gameData.created = this.created;
     gameData.p1 = this.p1.getPlayer();
     gameData.p2 = this.p2.getPlayer();
+    if(options?.deck) {
+      gameData.p1.deck = this.p1.deck.deck;
+      gameData.p2.deck = this.p2.deck.deck;
+    }
     gameData.turn = this.turn;
     gameData.previousTurn = this.previousTurn;
     gameData.previousTurnEvents = this.previousTurnEvents;
@@ -628,9 +632,9 @@ export  class Game extends EventEmitter implements GameEvents {
     return gameData;
   }
 
-  send(msg: string, p?: string) {
+  send(msg: string, p: string = "all") {
     console.log(`[SIM] |${p}|${msg}`)
-    this.emit("msg", `:${p ? p : "all"}:${msg}`);
+    this.emit("msg", {to : p,msg:msg});
   }
 
   PMError(p: PlayerID, msg: string) {

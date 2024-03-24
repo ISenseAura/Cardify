@@ -14,21 +14,36 @@ global.fetch = (url: RequestInfo, init?: RequestInit) =>
 export class BattleDeck {
 	cards: Dict<any>;
 	initDeck: Array<any>;
+	isLoaded:boolean;
 
-	constructor(deck: Array<any>) {
+	constructor(deck: any) {
 		this.initDeck = deck;
 
 		this.cards = {};
 
+		if(Array.isArray(deck)) {
 		this.initDeck.forEach((card) => {
 			if (card.id) {
 				this.cards[card.id] = card;
 			}
 		});
 	}
+	else {
+		this.isLoaded = true;
+		this.cards = deck;
+	}
+	}
 
 	get(id: string) {
+		//if(id.includes("#") && !this.isLoaded) id = id.split("#")[0];
 		return this.cards[id.trim()];
+	}
+
+	getImage(id: string,large?:boolean){
+		//if(id.includes("#") && !this.isLoaded) id = id.split("#")[0];
+		if(!this.cards[id.trim()]) throw new Error(`Card does not exist (ID : ${id}`);
+		if(!this.cards[id.trim()].images) throw new Error(`Card is corrupted (ID : ${id})`);
+		return this.cards[id.trim()].images[large ? "large" : "small"];
 	}
 }
 

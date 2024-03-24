@@ -7,6 +7,7 @@ import { Players } from "../players";
 import { EventEmitter } from "stream";
 import { BattlePage } from "../../html-pages/battle-page";
 import { TCGManager } from "../../html-pages/tcg-manager";
+import { PlayerID } from "../../commands/src/game";
 
 interface IPlayer {
 	id: string;
@@ -79,6 +80,12 @@ export class Battle {
 		);
 	}
 
+	client(id:string) {
+		if(id == "p1") return this.p1client;
+		if(id == "p2") return this.p2client;
+		throw new Error("Unexpected player ID received : " + id)
+	}
+
 	/*
     # PARSERERS
     */
@@ -123,8 +130,7 @@ export class Battle {
 						case "choose":
 							{
 								if (other[1] == "activepokemon") {
-									let msg = `>${broadcast} activepokemon ${this.game[broadcast].basicCards[0]}\n`;
-									this.stream._writeLines(msg);
+									this.client(broadcast).requireActivePokemon();
 								}
 							}
 							break;
@@ -147,6 +153,12 @@ export class Battle {
 					});
 				}
 				break;
+			
+				case "message":
+					{
+						this.broadcast(other.join("|"),broadcast);
+					}
+					break;
 		}
 	}
 
@@ -193,7 +205,7 @@ class _Battles {
 		this.mainRoom = Rooms.get(
 			Config.mainTCGRoom
 				? Config.mainTCGRoom
-				: "tcgtabletop"
+				: "groupchat-tcgtabletop-gametest"
 		);
 		this.challengesCount = {};
 		this.challenges = {};

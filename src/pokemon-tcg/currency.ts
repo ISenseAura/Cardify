@@ -26,7 +26,7 @@ class Currency {
         this.boss = "Cardiy"
 
 		this.givePerHour = 0.9;
-		this.givePerSec = 0.00005;
+		this.givePerSec = 0.000005;
 		this.initialCurrency = 10.00;
 
 		this.dir = path.join(rootFolder, "databases");
