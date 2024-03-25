@@ -23,381 +23,404 @@ import { Cards, CardsList, EnergyCard, ItemCard, PokemonCard } from "../cards";
 export type DeckDict = Record<string, Cards>;
 
 export class Deck {
-  private _top: Cards;
-  private _deck: DeckDict;
-  private _inputdeck: CardsList;
-  private _liveDeck: Array<string>;
-  private _shuffleCount: number;
-  private _discarded: DeckDict;
-  private _discardedIDs: Array<string>;
-  private _drawn: Array<string>;
-  private _isLoaded: boolean;
-  public count: number;
+	private _top: Cards;
+	private _deck: DeckDict;
+	private _inputdeck: CardsList;
+	private _liveDeck: Array<string>;
+	private _shuffleCount: number;
+	private _discarded: DeckDict;
+	private _discardedIDs: Array<string>;
+	private _drawn: Array<string>;
+	private _isLoaded: boolean;
+	public count: number;
 
-  readonly _pokemons: Record<string, PokemonCard>;
-  readonly _items: Record<string, ItemCard>;
-  readonly _energies: Record<string, EnergyCard>;
+	readonly _pokemons: Record<string, PokemonCard>;
+	readonly _items: Record<string, ItemCard>;
+	readonly _energies: Record<string, EnergyCard>;
 
-  constructor(deck: CardsList) {
-    this._top = deck[0];
-    this._inputdeck = deck;
-    this._deck = {};
-    this._liveDeck = [];
-    this.count = 0;
-    this._shuffleCount = 0;
-    this._discarded = {};
-    this._discardedIDs = [];
-    this._drawn = [];
-    this._isLoaded = false;
+	constructor(deck: CardsList) {
+		this._top = deck[0];
+		this._inputdeck = deck;
+		this._deck = {};
+		this._liveDeck = [];
+		this.count = 0;
+		this._shuffleCount = 0;
+		this._discarded = {};
+		this._discardedIDs = [];
+		this._drawn = [];
+		this._isLoaded = false;
 
-    this._pokemons = {};
-    this._items = {};
-    this._energies = {};
+		this._pokemons = {};
+		this._items = {};
+		this._energies = {};
 
-    this.init();
-  }
+		this.init();
+	}
 
-  public static load(mydeck: CardsList) {
-    if (mydeck.length >= 59)
-      throw new Error("Input deck is already a loaded deck");
-    let deck = mydeck;
-    if (mydeck && typeof mydeck == typeof []) deck = mydeck;
-    let newDeck: DeckDict = {};
-    for (let i = 0; i < deck.length; i++) {
-      let card = deck[i];
-      if (card.cardtype.startsWith("pok"))
-      card = new PokemonCard(card);
-    if (card.cardtype.startsWith("item"))
-      card = new ItemCard(card);
-    if (card.cardtype.startsWith("energy"))
-      card = new EnergyCard(card);
-    
-      let count = card.count;
-      if (count > 1) {
-        for (let j = 1; j <= count; j++) {
-          newDeck[card.ID + "#" + j] = card;
-        }
-      } else {
-        newDeck[card.ID] = card;
-      }
-    }
-    return newDeck;
-  }
+	public static load(mydeck: CardsList) {
+		if (mydeck.length >= 59)
+			throw new Error("Input deck is already a loaded deck");
+		let deck = mydeck;
+		if (mydeck && typeof mydeck == typeof []) deck = mydeck;
+		let newDeck: DeckDict = {};
+		for (let i = 0; i < deck.length; i++) {
+			let card = deck[i];
 
-  private load(): DeckDict {
-    if (this._isLoaded) return this._deck;
-    let deck = Deck.load(this._inputdeck);
+			let count = card.count;
+			if (count > 1) {
+				for (let j = 1; j <= count; j++) {
+					if (card.cardtype.startsWith("pok"))
+						newDeck[card.ID + "#" + j] = new PokemonCard(card);
+					if (card.cardtype.startsWith("item"))
+						newDeck[card.ID + "#" + j] = new ItemCard(card);
+					if (card.cardtype.startsWith("energy"))
+						newDeck[card.ID + "#" + j] = new EnergyCard(card);
+				}
+			} else {
+				newDeck[card.ID] = card;
+			}
+		}
 
-    Object.keys(deck).forEach((key) => {
-      this._liveDeck.push(key);
-      let card = deck[key];
-      card.ID = key;
-      if (card.cardtype.startsWith("pok"))
-        this._pokemons[key] = new PokemonCard(card);
-      if (card.cardtype.startsWith("item"))
-        this._items[key] = new ItemCard(card);
-      if (card.cardtype.startsWith("energy"))
-        this._energies[key] = new EnergyCard(card);
-    });
+		return newDeck;
+	}
 
-    this._isLoaded = true;
-    return deck;
-  }
+	private load(): DeckDict {
+		if (this._isLoaded) return this._deck;
+		let deck = Deck.load(this._inputdeck);
 
-  public init() {
-    this.parse();
-    this._deck = this.load();
+		Object.keys(deck).forEach((key) => {
+			this._liveDeck.push(key);
+			let card = deck[key];
+			deck[key].ID = key;
+			deck[key].id = key;
+			if (card.cardtype.startsWith("pok"))
+				this._pokemons[key] = new PokemonCard(card);
+			if (card.cardtype.startsWith("item"))
+				this._items[key] = new ItemCard(card);
+			if (card.cardtype.startsWith("energy"))
+				this._energies[key] = new EnergyCard(card);
+		});
 
-    this.shuffle(true);
+		this._isLoaded = true;
+		return deck;
+	}
 
-    this.count = this._liveDeck.length;
-  }
+	public init() {
+		this.parse();
+		this._deck = this.load();
 
-  private parse() {
-    if (!this._inputdeck) throw Error("Deck not initialised");
-    if (typeof this._inputdeck != typeof [])
-      throw Error(
-        "Invalid input deck : Expected an array, received : " +
-          typeof this._inputdeck
-      );
-  }
+		this.shuffle(true);
 
-  dictify(cards?: Array<string>): CardsList {
-    let list: CardsList = [];
-    (cards ? cards : this._liveDeck).forEach((id) => {
-      list.push(this._deck[id]);
-    });
-    return list;
-  }
+		this.count = this._liveDeck.length;
+	}
 
-  isEmpty(): boolean {
-    return !this._liveDeck.length;
-  }
+	private parse() {
+		if (!this._inputdeck) throw Error("Deck not initialised");
+		if (typeof this._inputdeck != typeof [])
+			throw Error(
+				"Invalid input deck : Expected an array, received : " +
+					typeof this._inputdeck
+			);
+	}
 
-  unliveCard(id: string): boolean {
-    if (!this._liveDeck.includes(id)) throw new Error(`Card does not exist on deck (ID : ${id})`);
-    this._liveDeck.splice(this._liveDeck.indexOf(id), 1);
-    this.count = this._liveDeck.length;
-    return true;
-  }
+	dictify(cards?: Array<string>): CardsList {
+		let list: CardsList = [];
+		(cards ? cards : this._liveDeck).forEach((id) => {
+			list.push(this._deck[id]);
+		});
+		return list;
+	}
 
-  card(id: string): Cards {
-    if (!this._deck[id]) throw new Error("Card does not exist on deck");
-    return this._deck[id];
-  }
+	isEmpty(): boolean {
+		return !this._liveDeck.length;
+	}
 
-  random(num: number = 1, updateDeck: boolean = false): CardsList {
-    let result = [];
-    for (let i = 0; i < num; i++) {
-      const len = this._inputdeck.length;
-      if (!len) throw new Error("Deck.random does not accept empty arrays");
-      result.push(this._deck[this.shuffle(false)[0]]);
-    }
+	unliveCard(id: string): boolean {
+		if (!this._liveDeck.includes(id))
+			throw new Error(`Card does not exist on deck (ID : ${id})`);
+		this._liveDeck.splice(this._liveDeck.indexOf(id), 1);
+		this.count = this._liveDeck.length;
+		return true;
+	}
 
-    return result;
-  }
+	card(id: string): Cards {
+		if (!this._deck[id]) throw new Error("Card does not exist on deck");
+		return this._deck[id];
+	}
 
-  draw(num: number): Array<string> {
-    if(num > this._liveDeck.length) throw new Error(`The deck does not have enough cards (NumberOfCardsWanted : ${num}, NumberOfCardsPresent : ${this._liveDeck.length})`);
-    let cards: Array<string> = this._liveDeck.slice(0, num);
-    cards.forEach((card) => {
-      this.unliveCard(card);
-      this._drawn.push(card);
-    });
+	random(num: number = 1, updateDeck: boolean = false): CardsList {
+		let result = [];
+		for (let i = 0; i < num; i++) {
+			const len = this._inputdeck.length;
+			if (!len)
+				throw new Error("Deck.random does not accept empty arrays");
+			result.push(this._deck[this.shuffle(false)[0]]);
+		}
 
-    return cards;
-  }
+		return result;
+	}
 
-  drawCustom(id: string): string {
-    if (!this._liveDeck.includes(id))
-    throw new Error(`Card does not exist in deck (ID : ${id})`);
+	draw(num: number): Array<string> {
+		if (num > this._liveDeck.length)
+			throw new Error(
+				`The deck does not have enough cards (NumberOfCardsWanted : ${num}, NumberOfCardsPresent : ${this._liveDeck.length})`
+			);
+		let cards: Array<string> = this._liveDeck.slice(0, num);
+		cards.forEach((card) => {
+			this.unliveCard(card);
+			this._drawn.push(card);
+		});
 
-    this.unliveCard(id);
-    this._drawn.push(id);
-    return id;
-  }
+		return cards;
+	}
 
-  drawFromDiscardPile(num: number): Array<string> | boolean {
-    if (this.discardedIDs.length < num) throw new Error(`The discard pile does not have enough cards (NumberOfCardsWanted : ${num}, NumberOfCardsPresent : ${this.discardedIDs.length})`);
-    let cards: Array<string> = this._discardedIDs.slice(0, num);
-    cards.forEach((card) => {
-      this.unliveCard(card);
-      this._drawn.push(card);
-    });
+	drawCustom(id: string): string {
+		if (!this._liveDeck.includes(id))
+			throw new Error(`Card does not exist in deck (ID : ${id})`);
 
-    return cards;
-  }
+		this.unliveCard(id);
+		this._drawn.push(id);
+		return id;
+	}
 
-  getCard(id: string): Cards  {
-    if (this._deck[id]) return this._deck[id];
-    throw new Error(`Card does not exist in deck (ID : ${id}`)
-  }
+	drawFromDiscardPile(num: number): Array<string> | boolean {
+		if (this.discardedIDs.length < num)
+			throw new Error(
+				`The discard pile does not have enough cards (NumberOfCardsWanted : ${num}, NumberOfCardsPresent : ${this.discardedIDs.length})`
+			);
+		let cards: Array<string> = this._discardedIDs.slice(0, num);
+		cards.forEach((card) => {
+			this.unliveCard(card);
+			this._drawn.push(card);
+		});
 
-  deckHasCard(id: string): boolean {
-    if (this._liveDeck.includes(id) && this._deck[id]) return true;
-    return false;
-  }
+		return cards;
+	}
 
-  putBackDrawnCard(id: string): boolean {
-    if (this._deck[id] && this._drawn.includes(id)) {
-      this._liveDeck.push(id);
-      this._drawn.splice(this._drawn.indexOf(id), 1);
-      return true;
-    }
-    if (!this._deck[id] || !this._drawn.includes(id)) {
-     
-      throw new Error(`Card has not been drawn (ID : ${id}`)
-      return false;
-    }
-    return false;
-  }
+	getCard(id: string): Cards {
+		if (this._deck[id]) return this._deck[id];
+		throw new Error(`Card does not exist in deck (ID : ${id}`);
+	}
 
-  putBackDiscardedCard(id: string): boolean {
-    if (this._deck[id] && this._discardedIDs.includes(id)) {
-      this._liveDeck.push(id);
-      this._discardedIDs.splice(this._discardedIDs.indexOf(id), 1);
-      return true;
-    }
-    if (!this._deck[id] || !this._discardedIDs.includes(id)) {
-      throw new Error(`Card does not exist in discard pile (ID : ${id})`)
-      return false;
-    }
-    return false;
-  }
+	deckHasCard(id: string): boolean {
+		if (this._liveDeck.includes(id) && this._deck[id]) return true;
+		return false;
+	}
 
-  shuffle(save: boolean): Array<string> {
-    //let deck : CardsList = this._inputdeck.slice();
+	putBackDrawnCard(id: string): boolean {
+		if (this._deck[id] && this._drawn.includes(id)) {
+			this._liveDeck.push(id);
+			this._drawn.splice(this._drawn.indexOf(id), 1);
+			return true;
+		}
+		if (!this._deck[id] || !this._drawn.includes(id)) {
+			throw new Error(`Card has not been drawn (ID : ${id}`);
+			return false;
+		}
+		return false;
+	}
 
-    let deck: Array<string> = this._liveDeck;
-    // Fisher-Yates shuffle algorithm
-    let currentIndex: number = deck.length;
-    let randomIndex: number = 0;
-    let temporaryValue: string;
+	putBackDiscardedCard(id: string): boolean {
+		if (this._deck[id] && this._discardedIDs.includes(id)) {
+			this._liveDeck.push(id);
+			this._discardedIDs.splice(this._discardedIDs.indexOf(id), 1);
+			return true;
+		}
+		if (!this._deck[id] || !this._discardedIDs.includes(id)) {
+			throw new Error(`Card does not exist in discard pile (ID : ${id})`);
+			return false;
+		}
+		return false;
+	}
 
-    // While there remain elements to shuffle...
-    while (currentIndex !== 0) {
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
+	shuffle(save: boolean): Array<string> {
+		//let deck : CardsList = this._inputdeck.slice();
 
-      // And swap it with the current element.
-      temporaryValue = deck[currentIndex];
-      deck[currentIndex] = deck[randomIndex];
-      deck[randomIndex] = temporaryValue;
-    }
-    if (save) {
-      this._liveDeck = deck;
-      this.count = this._liveDeck.length;
-      //this.init();
-      this._top = this.deck[this._liveDeck[0]];
-    }
-    return deck;
-  }
+		let deck: Array<string> = this._liveDeck;
+		// Fisher-Yates shuffle algorithm
+		let currentIndex: number = deck.length;
+		let randomIndex: number = 0;
+		let temporaryValue: string;
 
-  shuffleDiscardPile(save: boolean): Array<string> {
-    //let deck : CardsList = this._inputdeck.slice();
+		// While there remain elements to shuffle...
+		while (currentIndex !== 0) {
+			// Pick a remaining element...
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex -= 1;
 
-    let deck: Array<string> = this._discardedIDs;
-    // Fisher-Yates shuffle algorithm
-    let currentIndex: number = deck.length;
-    let randomIndex: number = 0;
-    let temporaryValue: string;
+			// And swap it with the current element.
+			temporaryValue = deck[currentIndex];
+			deck[currentIndex] = deck[randomIndex];
+			deck[randomIndex] = temporaryValue;
+		}
+		if (save) {
+			this._liveDeck = deck;
+			this.count = this._liveDeck.length;
+			//this.init();
+			this._top = this.deck[this._liveDeck[0]];
+		}
+		return deck;
+	}
 
-    // While there remain elements to shuffle...
-    while (currentIndex !== 0) {
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
+	shuffleDiscardPile(save: boolean): Array<string> {
+		//let deck : CardsList = this._inputdeck.slice();
 
-      // And swap it with the current element.
-      temporaryValue = deck[currentIndex];
-      deck[currentIndex] = deck[randomIndex];
-      deck[randomIndex] = temporaryValue;
-    }
-    if (save) {
-      this._discardedIDs = deck;
-      //this.init();
-      // this._top = this._inputdeck[0];
-    }
-    return deck;
-  }
+		let deck: Array<string> = this._discardedIDs;
+		// Fisher-Yates shuffle algorithm
+		let currentIndex: number = deck.length;
+		let randomIndex: number = 0;
+		let temporaryValue: string;
 
-  discard(id: string): boolean {
-    if (!this._deck[id]) throw new Error(`Card does not exist in deck (ID : ${id})`);
-    this._discarded[id] = this._deck[id];
-    this._discardedIDs.push(id);
-    this.unliveCard(id);
-    return true;
-  }
+		// While there remain elements to shuffle...
+		while (currentIndex !== 0) {
+			// Pick a remaining element...
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex -= 1;
 
-  public getPokemon(id: string): PokemonCard {
-    if (!this.pokemons[id])
-      throw new Error("Pokemon Card does not exist in deck (ID : " + id + ")");
-    return this.pokemons[id];
-  }
+			// And swap it with the current element.
+			temporaryValue = deck[currentIndex];
+			deck[currentIndex] = deck[randomIndex];
+			deck[randomIndex] = temporaryValue;
+		}
+		if (save) {
+			this._discardedIDs = deck;
+			//this.init();
+			// this._top = this._inputdeck[0];
+		}
+		return deck;
+	}
 
-  public getEnergy(id: string): EnergyCard {
-    if (!this.energies[id])
-      throw new Error("Energy Card does not exist in deck (ID : " + id + ")");
-    return this.energies[id];
-  }
+	discard(id: string): boolean {
+		if (!this._deck[id])
+			throw new Error(`Card does not exist in deck (ID : ${id})`);
+		this._discarded[id] = this._deck[id];
+		this._discardedIDs.push(id);
+		this.unliveCard(id);
+		return true;
+	}
 
-  public getItem(id: string): ItemCard {
-    if (!this.items[id]) throw new Error("Item Card does not exist in deck (ID : " + id + ")");
-    return this.items[id];
-  }
+	public getPokemon(id: string): PokemonCard {
+		if (!this.pokemons[id])
+			throw new Error(
+				"Pokemon Card does not exist in deck (ID : " + id + ")"
+			);
+		return this.pokemons[id];
+	}
 
+	public getEnergy(id: string): EnergyCard {
+		if (!this.energies[id])
+			throw new Error(
+				"Energy Card does not exist in deck (ID : " + id + ")"
+			);
+		return this.energies[id];
+	}
 
-public getFromDeck(category:string) {
-  switch(category) {
-    case "energy" : {
-      let energies: Array<string> = [];
-      this._liveDeck.forEach((id:string) => {
-        let card = this.getCard(id);
-        if(card.cardtype == "energy") energies.push(id)
-      })
-    return energies;
-    }
-    break;
+	public getItem(id: string): ItemCard {
+		if (!this.items[id])
+			throw new Error(
+				"Item Card does not exist in deck (ID : " + id + ")"
+			);
+		return this.items[id];
+	}
 
-    case "pokemon" : {
-      let pkmns: Array<string> = [];
-      this._liveDeck.forEach((id:string) => {
-        let card = this.getCard(id);
-        if(card.cardtype == "pokemon") pkmns.push(id)
-      })
-    return pkmns;
-    }
-    break;
+	public getFromDeck(category: string) {
+		switch (category) {
+			case "energy":
+				{
+					let energies: Array<string> = [];
+					this._liveDeck.forEach((id: string) => {
+						let card = this.getCard(id);
+						if (card.cardtype == "energy") energies.push(id);
+					});
+					return energies;
+				}
+				break;
 
-    case "item" : {
-      let items: Array<string> = [];
-      this._liveDeck.forEach((id:string) => {
-        let card = this.getCard(id);
-        if(card.cardtype == "item") items.push(id)
-      })
-    return items;
-    }
-    break;
-  }
-}
+			case "pokemon":
+				{
+					let pkmns: Array<string> = [];
+					this._liveDeck.forEach((id: string) => {
+						let card = this.getCard(id);
+						if (card.cardtype == "pokemon") pkmns.push(id);
+					});
+					return pkmns;
+				}
+				break;
 
-  public get deck() {
-    return this._deck;
-  }
+			case "item":
+				{
+					let items: Array<string> = [];
+					this._liveDeck.forEach((id: string) => {
+						let card = this.getCard(id);
+						if (card.cardtype == "item") items.push(id);
+					});
+					return items;
+				}
+				break;
+		}
+	}
 
-  public get top() {
-    return this._top;
-  }
+	public get deck() {
+		return this._deck;
+	}
 
-  public get liveDeck() {
-    return this._liveDeck;
-  }
+	public get top() {
+		return this._top;
+	}
 
-  public get inputdeck() {
-    return this._inputdeck;
-  }
+	public get liveDeck() {
+		return this._liveDeck;
+	}
 
-  public get drawn() {
-    return this._drawn;
-  }
-  public get discarded() {
-    return this._discarded;
-  }
-  public get discardedIDs() {
-    return this._discardedIDs;
-  }
+	public get inputdeck() {
+		return this._inputdeck;
+	}
 
-  public get pokemons() {
-    return this._pokemons;
-  }
+	public get drawn() {
+		return this._drawn;
+	}
+	public get discarded() {
+		return this._discarded;
+	}
+	public get discardedIDs() {
+		return this._discardedIDs;
+	}
 
-  public get items() {
-    return this._items;
-  }
-  public get energies() {
-    return this._energies;
-  }
+	public get pokemons() {
+		return this._pokemons;
+	}
 
-  public static validate(deck: CardsList): boolean {
-   // console.log(deck.length)
- 
-    let totalCards = 0;
-    let hasBasic = false;
+	public get items() {
+		return this._items;
+	}
+	public get energies() {
+		return this._energies;
+	}
 
-    for (let i = 0; i < deck.length; i++) {
-      let card: any = deck[i];
-      totalCards += card.count;
-      if (card.isBasic) hasBasic = true;
-      if (card.count > 4 && card.cardtype !="energy")
-        throw new Error(
-          "[INVALID DECK] A Deck can only have upto 4 copies of a card"
-        );
-    }
-    if(!hasBasic) throw new Error("[INVALID DECK] A deck must have atleast one basic pokemon card")
-    console.log(totalCards)
-    if (totalCards !== 60)
-    throw new Error("[INVALID DECK] The deck must contain exact 60 cards");
-    return true;
-  }
+	public static validate(deck: CardsList): boolean {
+		// console.log(deck.length)
+
+		let totalCards = 0;
+		let hasBasic = false;
+
+		for (let i = 0; i < deck.length; i++) {
+			let card: any = deck[i];
+			totalCards += card.count;
+			if (card.isBasic) hasBasic = true;
+			if (card.count > 4 && card.cardtype != "energy")
+				throw new Error(
+					"[INVALID DECK] A Deck can only have upto 4 copies of a card"
+				);
+		}
+		if (!hasBasic)
+			throw new Error(
+				"[INVALID DECK] A deck must have atleast one basic pokemon card"
+			);
+		console.log(totalCards);
+		if (totalCards !== 60)
+			throw new Error(
+				"[INVALID DECK] The deck must contain exact 60 cards"
+			);
+		return true;
+	}
 }

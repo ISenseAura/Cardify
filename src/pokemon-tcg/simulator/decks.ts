@@ -23,8 +23,8 @@ export class BattleDeck {
 
 		if(Array.isArray(deck)) {
 		this.initDeck.forEach((card) => {
-			if (card.id) {
-				this.cards[card.id] = card;
+			if (card.ID) {
+				this.cards[card.ID] = card;
 			}
 		});
 	}

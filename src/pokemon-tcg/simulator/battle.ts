@@ -103,6 +103,7 @@ export class Battle {
 			case "init":
 				{
 					this.game = JSON.parse(other[0]);
+					console.log(this.game.p1.deck)
 					this.p1client?.boardInit(this.game)
 					this.p2client?.boardInit(this.game)
 
@@ -247,6 +248,7 @@ class _Battles {
 		page: any
 	) {
 		if (!from || !to) return false;
+		if(!this.mainRoom) throw new Error("TCG main room is not initialized.")
 		if (this.challengesCount[from.id] > 3 && from.id != "pokem9n")
 			return from.say(
 				"Due to spam reasons, you are allowed to challenge 3 times only during beta testing."
