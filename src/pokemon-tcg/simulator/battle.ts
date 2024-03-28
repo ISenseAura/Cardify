@@ -80,10 +80,10 @@ export class Battle {
 		);
 	}
 
-	client(id:string) {
-		if(id == "p1") return this.p1client;
-		if(id == "p2") return this.p2client;
-		throw new Error("Unexpected player ID received : " + id)
+	client(id: string) {
+		if (id == "p1") return this.p1client;
+		if (id == "p2") return this.p2client;
+		throw new Error("Unexpected player ID received : " + id);
 	}
 
 	/*
@@ -97,16 +97,15 @@ export class Battle {
 		let type = args[2];
 		let other = args.slice(3);
 
-		this.broadcast(input.slice(0,400),broadcast);
+		this.broadcast(input.slice(0, 400), broadcast);
 
 		switch (type) {
 			case "init":
 				{
 					this.game = JSON.parse(other[0]);
-					console.log(this.game.p1.deck)
-					this.p1client?.boardInit(this.game)
-					this.p2client?.boardInit(this.game)
-
+					console.log(this.game.p1.deck);
+					this.p1client?.boardInit(this.game);
+					this.p2client?.boardInit(this.game);
 				}
 				break;
 
@@ -114,11 +113,10 @@ export class Battle {
 				{
 					let upOf = other[0];
 					let up = other[1];
-					this.p1client?.boardUpdate(JSON.parse(up),upOf == "p1")
-					this.p2client?.boardUpdate(JSON.parse(up),upOf == "p2")
+					this.p1client?.boardUpdate(JSON.parse(up), upOf == "p1");
+					this.p2client?.boardUpdate(JSON.parse(up), upOf == "p2");
 
 					this.game[upOf] = JSON.parse(up);
-				
 				}
 				break;
 
@@ -131,35 +129,32 @@ export class Battle {
 						case "choose":
 							{
 								if (other[1] == "activepokemon") {
-									this.client(broadcast).requireActivePokemon();
+									this.client(
+										broadcast
+									).requireActivePokemon();
 								}
+							}
+							break;
+
+						case "choices":
+							{
+								let arg = other.slice(1, other.length);
+								let choices = arg[0].split(",");
+								let data = JSON.parse(arg[1]);
+								console.log(arg);
+
+								this.client(broadcast).updateAvailableChoices(choices,data);
 							}
 							break;
 					}
 				}
 				break;
 
-			case "choices":
+			case "message":
 				{
-					let arg = other.slice(1, other.length);
-					let choices = arg[0].split(",");
-					let data = JSON.parse(arg);
-					console.log(arg);
-
-					choices.forEach((choice) => {
-						switch (choice) {
-							case "bench": {
-							}
-						}
-					});
+					this.broadcast(other.join("|"), broadcast);
 				}
 				break;
-			
-				case "message":
-					{
-						this.broadcast(other.join("|"),broadcast);
-					}
-					break;
 		}
 	}
 
@@ -248,7 +243,8 @@ class _Battles {
 		page: any
 	) {
 		if (!from || !to) return false;
-		if(!this.mainRoom) throw new Error("TCG main room is not initialized.")
+		if (!this.mainRoom)
+			throw new Error("TCG main room is not initialized.");
 		if (this.challengesCount[from.id] > 3 && from.id != "pokem9n")
 			return from.say(
 				"Due to spam reasons, you are allowed to challenge 3 times only during beta testing."

@@ -123,7 +123,7 @@ class Packs {
 		let rs1 = await pokemon.card.all({ q: `set.id:${id} ${slot1}` });
 		//	if(!rs1.length) rs1 = await pokemon.card.all({ q: `set.id:${id} !rarity:rare` });
 		if (!rs1.length)
-			rs1 = await pokemon.card.all({ q: `set.id:${id} rarity:rare` });
+			rs1 = await pokemon.card.all({ q: `set.id:${id} !rarity:rare` });
 
 		console.log(rs1);
 		let aa = Tools.sampleMany(rs1, 2);
@@ -148,14 +148,18 @@ class Packs {
 		let uncm = await pokemon.card.all({
 			q: `set.id:${id} rarity:uncommon`,
 		});
-
+		let shinyEnergyFactor = Tools.random(100);
 		let en = await pokemon.card.all({
-			q: `set.id:${id} supertype:energy subtypes:basic`,
+			q: `set.id:${id} supertype:energy subtypes:basic ${
+				shinyEnergyFactor == 69 ? "" : "-rarity:secret"
+			}`,
 		});
 
 		if (!en.length)
 			en = await pokemon.card.all({
-				q: `set.id:${"sm1"} supertype:energy -name:Fairy subtypes:basic`,
+				q: `set.id:${"sm1"} supertype:energy -name:Fairy subtypes:basic ${
+					shinyEnergyFactor == 69 ? "" : "-rarity:secret"
+				}`,
 			});
 
 		console.log(en.length);
@@ -246,6 +250,17 @@ class Packs {
 		});
 		db[user.id].packsOpened.push(pack);
 
+		this.sortCollections(user.id);
+		this.updateDatabase("collection");
+	}
+
+	addCard(user: User, card: any, via: string) {
+		let db = this.collection;
+		if (!db[user.id]) {
+			db[user.id] = { cards: [], packsOpened: [] };
+		}
+		card.obtainedVia = via + " (" + Date() + ")";
+		db[user.id].cards.push(card);
 		this.sortCollections(user.id);
 		this.updateDatabase("collection");
 	}

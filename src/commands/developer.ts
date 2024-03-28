@@ -14,6 +14,9 @@ import pokemon from "pokemontcgsdk"
 
 import Simulator from './src/simulator';
 
+import { GuessTheCard } from '../pokemon-tcg/minigames/guessthecard';
+import { Minigames } from '../pokemon-tcg/minigames';
+
 
 
 
@@ -33,6 +36,8 @@ export const commands: BaseCommandDefinitions = {
 				let API = pokemon;
 				 let decks = Decks;
 				 let BTS = Battles;
+				let gtc = GuessTheCard;
+				let mgs = Minigames;
 				
 				//let sim = new Simulator();
 				let result = eval(target) as unknown;

@@ -131,7 +131,7 @@ export abstract class Side {
     if (!this.deck.deck[id]) throw new Error("Card does not exist");
     let pcard: Cards = this.deck.deck[id];
     if (this.bench.includes(id)) this.bench.splice(this.bench.indexOf(id), 1);
-    if (this.hand.includes(id)) this.hand.splice(this.bench.indexOf(id), 1);
+    if (this.hand.includes(id)) this.hand.splice(this.hand.indexOf(id), 1);
     if(this.active?.ID == pcard.ID) this.active = null;
   }
 

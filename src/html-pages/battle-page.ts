@@ -44,6 +44,9 @@ export class BattlePage extends HtmlPageBase {
 	customMessages: Array<string>;
 	outgoingProtocols: Array<string>;
 
+	actionNeeded: boolean;
+	performableActions: Array<string>;
+
 	constructor(room: Room, user: User, battleid: string, challenge: any) {
 		super(room, user, baseCommand, pages);
 
@@ -103,6 +106,9 @@ export class BattlePage extends HtmlPageBase {
 
 		this.customMessages = [];
 		this.viewCardInHand = null;
+
+		this.actionNeeded = false;
+		this.performableActions = [];
 	}
 
 	/* @SIMULATOR-PROTOCOL-EVENT-HANDLERS */
@@ -120,7 +126,30 @@ export class BattlePage extends HtmlPageBase {
 			throw new Error(
 				`Card ${id} does not exist in ${this.userId}'s deck`
 			);
-			this.sendProtocol(`activepokemon ${id}`);
+		this.sendProtocol(`activepokemon ${id}`);
+		this.viewCardInHand = null;
+	}
+
+	addToBench(id: string) {
+		let card = this.decks.me.get(id);
+		if (!card)
+			throw new Error(
+				`Card ${id} does not exist in ${this.userId}'s deck`
+			);
+		//if(!card.isBasic)  throw new Error(`card ${id} is not a basic card`);
+		this.sendProtocol(`bench ${id}`);
+		this.viewCardInHand = null;
+	}
+
+	updateAvailableChoices(choices: Array<string> | string, data?: any) {
+		if(Array.isArray(choices)) this.performableActions = choices;
+		if(typeof choices == typeof "" && !choices.includes(",")) this.performableActions.push(choices as string);
+		this.send();
+	}
+
+	canUseAction(action:string) {
+		if(this.performableActions.includes(action)) return true;
+		return false;
 	}
 
 	sendProtocol(line: string) {
@@ -130,7 +159,7 @@ export class BattlePage extends HtmlPageBase {
 		this.send();
 	}
 
-	// Simulator Events Handlers
+	// Client Simulator Events Handlers
 
 	log(line: string) {
 		console.log(`[BP-Log] ${line}`);
@@ -247,7 +276,9 @@ export class BattlePage extends HtmlPageBase {
 		}</div> 			 </button> 			</div>`;
 
 		let oppDeck = `<div style="position: absolute; bottom: -130%; left: 0"> 			 <button 				id="opponent-deck" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<div 				 style=" 					background: url(${"https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg"}) 					 center/contain no-repeat; 					height: 4vw; 					width: 3vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 40px; 					max-width: 30px; 					min-height: 25px; 					min-width: 18.75px; 				 " 				> ${
-			this.board.opponent.deck
+			typeof this.board.opponent.deck == typeof {}
+				? Object.keys(this.board.opponent.deck).length
+				: this.board.opponent.deck
 		}</div> 			 </button> 			</div>`;
 
 		let oppBenchCardsHtml = ``;
@@ -258,7 +289,7 @@ export class BattlePage extends HtmlPageBase {
 				link = `https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg`;
 			}
 
-			oppBenchCardsHtml += `	 <button 				id="opponent-bench-1" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url(${link}) 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button>`;
+			oppBenchCardsHtml += `	 <button 				id="opponent-bench-1" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('${link}') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button>`;
 		}
 
 		let oppBenchCards = `<ul 			 style=" 				padding: 0; 				margin: 0 auto; 				display: table; 				text-align: center; 				width: auto; 			 " 			> 			 ${oppBenchCardsHtml} 			</ul>`;
@@ -277,17 +308,60 @@ export class BattlePage extends HtmlPageBase {
 
 		let mySideStart = `<div 		 style=" 			background: rgba(19, 23, 69, 0.6); 			box-shadow: inset -1px -1px 2px #fff, inset 1px 1px 2px #fff; 			border-radius: 8px; 			margin: 3px 10px; 			padding: 10px; 		 " 		>`;
 
-		let myActiveCard = `<div style="margin: 0 auto"> 			<button 			 id="active-card" 			 style=" 				background: none; 				color: inherit; 				border: none; 				padding: 0; 				font: inherit; 				cursor: pointer; 				outline: inherit; 			 " 			> 			 <div 				style=" 				 background: url('https://images.pokemontcg.io/xy1/44.png') 					center/contain no-repeat; 				 height: 10vw; 				 width: 7.5vw; 				 margin: 0 auto; 				 margin-bottom: 3vh; 				 max-height: 70px; 				 max-width: 52.5px; 				" 			 ></div> 			</button> 		 </div>`;
+		let myActiveCard = `<div style="margin: 0 auto"> 			<button 			 id="active-card" 			 style=" 				background: none; 				color: inherit; 				border: none; 				padding: 0; 				font: inherit; 				cursor: pointer; 				outline: inherit; 			 " 			> 			 <div 				style=" 				 background: url('${
+			this.board.me.active
+				? this.decks.me.getImage(this.board.me.active.ID)
+				: "https://xmple.com/wallpaper/solid-color-plain-black-single-one-colour-2160x3240-c-060a07-f-24.svg"
+		}') 					center/contain no-repeat; 				 height: 10vw; 				 width: 7.5vw; 				 margin: 0 auto; 				 margin-bottom: 3vh; 				 max-height: 70px; 				 max-width: 52.5px; 				" 			 ></div> 			</button> 		 </div>`;
 
 		let myExceptActiveStart = `<div style="text-align: center; position: relative">`;
 
-		let myDeck = ` <div style="position: absolute; top: -130%; right: 0"> 			 <button 				id="deck" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<div 				 style=" 					background: url('https://images.pokemontcg.io/xy1/44.png') 					 center/contain no-repeat; 					height: 4vw; 					width: 3vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 40px; 					max-width: 30px; 					min-height: 25px; 					min-width: 18.75px; 				 " 				></div> 			 </button> 			</div>`;
+		let myDeck = ` <div style="position: absolute; top: -130%; right: 0"> 			 <button 				id="deck" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<div 				 style=" 					background: url('https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg') 					 center/contain no-repeat; 					height: 4vw; 					width: 3vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 40px; 					max-width: 30px; 					min-height: 25px; 					min-width: 18.75px; 				 " 				></div> 			 </button> 			</div>`;
 
-		let myDiscardPile = `<div style="position: absolute; top: -50%; right: 0"> 			 <button 				id="discard-pile" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<div 				 style=" 					background: url('https://images.pokemontcg.io/xy1/44.png') 					 center/contain no-repeat; 					height: 4vw; 					width: 3vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 40px; 					max-width: 30px; 					min-height: 25px; 					min-width: 18.75px; 				 " 				></div> 			 </button> 			</div>`;
+		let myDiscardPile = `<div style="position: absolute; top: -50%; right: 0"> 			 <button 				id="discard-pile" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<div 				 style=" 					background: url('https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg') 					 center/contain no-repeat; 					height: 4vw; 					width: 3vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 40px; 					max-width: 30px; 					min-height: 25px; 					min-width: 18.75px; 				 " 				> ${this.board.opponent.discardPile}</div> 			 </button> 			</div>`;
 
-		let myBenchCards = `<ul 			 style=" 				padding: 0; 				margin: 0 auto; 				display: table; 				text-align: center; 				width: auto; 			 " 			> 			 <button 				id="bench-1" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('https://images.pokemontcg.io/xy1/44.png') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button> 			 <button 				id="bench-2" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('https://images.pokemontcg.io/xy1/44.png') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button> 			 <button 				id="bench-3" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('https://images.pokemontcg.io/xy1/44.png') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button> 			 <button 				id="bench-4" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('https://images.pokemontcg.io/xy1/44.png') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button> 			 <button 				id="bench-5" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('https://images.pokemontcg.io/xy1/44.png') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button> 			</ul>`;
 
-		let myPrizeCards = `<div style="position: absolute; bottom: 100%; left: 0; z-index: 10"> 			 <ul 				style=" 				 padding: 0; 				 margin: 0 auto; 				 display: table; 				 text-align: center; 				 width: auto; 				" 			 > 				<button 				 id="prize-1" 				 style=" 					background: none; 					color: inherit; 					border: none; 					padding: 0; 					font: inherit; 					cursor: pointer; 					outline: inherit; 				 " 				> 				 <li 					style=" 					 background: url('https://images.pokemontcg.io/xy1/44.png') 						center/contain no-repeat; 					 height: 4vw; 					 width: 3vw; 					 display: inline-block; 					 margin: 0 1px; 					 max-height: 30px; 					 max-width: 22.5px; 					" 				 ></li> 				</button> 				<button 				 id="prize-2" 				 style=" 					background: none; 					color: inherit; 					border: none; 					padding: 0; 					font: inherit; 					cursor: pointer; 					outline: inherit; 				 " 				> 				 <li 					style=" 					 background: url('https://images.pokemontcg.io/xy1/44.png') 						center/contain no-repeat; 					 height: 4vw; 					 width: 3vw; 					 display: inline-block; 					 margin: 0 1px; 					 max-height: 30px; 					 max-width: 22.5px; 					" 				 ></li> 				</button> 			 </ul> 			 <ul 				style=" 				 padding: 0; 				 margin: 0 auto; 				 display: table; 				 text-align: center; 				 width: auto; 				" 			 > 				<button 				 id="prize-3" 				 style=" 					background: none; 					color: inherit; 					border: none; 					padding: 0; 					font: inherit; 					cursor: pointer; 					outline: inherit; 				 " 				> 				 <li 					style=" 					 background: url('https://images.pokemontcg.io/xy1/44.png') 						center/contain no-repeat; 					 height: 4vw; 					 width: 3vw; 					 display: inline-block; 					 margin: 0 1px; 					 max-height: 30px; 					 max-width: 22.5px; 					" 				 ></li> 				</button> 				<button 				 id="prize-4" 				 style=" 					background: none; 					color: inherit; 					border: none; 					padding: 0; 					font: inherit; 					cursor: pointer; 					outline: inherit; 				 " 				> 				 <li 					style=" 					 background: url('https://images.pokemontcg.io/xy1/44.png') 						center/contain no-repeat; 					 height: 4vw; 					 width: 3vw; 					 display: inline-block; 					 margin: 0 1px; 					 max-height: 30px; 					 max-width: 22.5px; 					" 				 ></li> 				</button> 			 </ul> 			 <ul 				style=" 				 padding: 0; 				 margin: 0 auto; 				 display: table; 				 text-align: center; 				 width: auto; 				" 			 > 				<button 				 id="prize-5" 				 style=" 					background: none; 					color: inherit; 					border: none; 					padding: 0; 					font: inherit; 					cursor: pointer; 					outline: inherit; 				 " 				> 				 <li 					style=" 					 background: url('https://images.pokemontcg.io/xy1/44.png') 						center/contain no-repeat; 					 height: 4vw; 					 width: 3vw; 					 display: inline-block; 					 margin: 0 1px; 					 max-height: 30px; 					 max-width: 22.5px; 					" 				 ></li> 				</button> 				<button 				 id="prize-6" 				 style=" 					background: none; 					color: inherit; 					border: none; 					padding: 0; 					font: inherit; 					cursor: pointer; 					outline: inherit; 				 " 				> 				 <li 					style=" 					 background: url('https://images.pokemontcg.io/xy1/44.png') 						center/contain no-repeat; 					 height: 4vw; 					 width: 3vw; 					 display: inline-block; 					 margin: 0 1px; 					 max-height: 30px; 					 max-width: 22.5px; 					" 				 ></li> 				</button> 			 </ul> 			</div>`;
+
+		let myBenchCardsHtml = ``;
+
+		for (let i = 0; i < 5; i++) {
+			let link = `https://xmple.com/wallpaper/solid-color-plain-black-single-one-colour-2160x3240-c-060a07-f-24.svg`;
+			if (this.board.me.bench[i]) {
+				link = `https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg`;
+			}
+
+			myBenchCardsHtml += `	 <button 				id="opponent-bench-1" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('${link}') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button>`;
+		}
+
+
+		let myBenchCards = `<ul 			 style=" 				padding: 0; 				margin: 0 auto; 				display: table; 				text-align: center; 				width: auto; 			 " 			> 		${myBenchCardsHtml} </ul>`;
+
+		let myPrize12CardsHtml = ``;
+		let myPrize34CardsHtml = ``;
+		let myPrize56CardsHtml = ``;
+
+		for (let i = 0; i < 2; i++) {
+			if (this.board.me.prizeCards[i])
+				return (myPrize12CardsHtml += `<button 			id="opponent-prize-1" 			style=" 			 background: none; 			 color: inherit; 			 border: none; 			 padding: 0; 			 font: inherit; 			 cursor: pointer; 			 outline: inherit; 			" 		 > 			<li 			 style=" 				background: black;				height: 4vw; 				width: 3vw; 				display: inline-block; 				margin: 0 1px; 				max-height: 30px; 				max-width: 22.5px; 			 " 			></li> 		 </button>`);
+
+			myPrize12CardsHtml += `<button 			id="opponent-prize-1" 			style=" 			 background: none; 			 color: inherit; 			 border: none; 			 padding: 0; 			 font: inherit; 			 cursor: pointer; 			 outline: inherit; 			" 		 > 			<li 			 style=" 				background: url(${"https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg"}) 				 center/contain no-repeat; 				height: 4vw; 				width: 3vw; 				display: inline-block; 				margin: 0 1px; 				max-height: 30px; 				max-width: 22.5px; 			 " 			></li> 		 </button>`;
+		}
+
+		for (let i = 2; i < 4; i++) {
+			if (this.board.me.prizeCards[i])
+				return (myPrize34CardsHtml += `<button 			id="opponent-prize-1" 			style=" 			 background: none; 			 color: inherit; 			 border: none; 			 padding: 0; 			 font: inherit; 			 cursor: pointer; 			 outline: inherit; 			" 		 > 			<li 			 style=" 				background: black;				height: 4vw; 				width: 3vw; 				display: inline-block; 				margin: 0 1px; 				max-height: 30px; 				max-width: 22.5px; 			 " 			></li> 		 </button>`);
+
+			myPrize34CardsHtml += `<button 			id="opponent-prize-1" 			style=" 			 background: none; 			 color: inherit; 			 border: none; 			 padding: 0; 			 font: inherit; 			 cursor: pointer; 			 outline: inherit; 			" 		 > 			<li 			 style=" 				background: url(${"https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg"}) 				 center/contain no-repeat; 				height: 4vw; 				width: 3vw; 				display: inline-block; 				margin: 0 1px; 				max-height: 30px; 				max-width: 22.5px; 			 " 			></li> 		 </button>`;
+		}
+
+		for (let i = 4; i < 6; i++) {
+			if (this.board.me.prizeCards[i])
+				return (myPrize56CardsHtml += `<button 			id="opponent-prize-1" 			style=" 			 background: none; 			 color: inherit; 			 border: none; 			 padding: 0; 			 font: inherit; 			 cursor: pointer; 			 outline: inherit; 			" 		 > 			<li 			 style=" 				background: black;				height: 4vw; 				width: 3vw; 				display: inline-block; 				margin: 0 1px; 				max-height: 30px; 				max-width: 22.5px; 			 " 			></li> 		 </button>`);
+
+			myPrize56CardsHtml += `<button 			id="opponent-prize-1" 			style=" 			 background: none; 			 color: inherit; 			 border: none; 			 padding: 0; 			 font: inherit; 			 cursor: pointer; 			 outline: inherit; 			" 		 > 			<li 			 style=" 				background: url(${"https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg"}) 				 center/contain no-repeat; 				height: 4vw; 				width: 3vw; 				display: inline-block; 				margin: 0 1px; 				max-height: 30px; 				max-width: 22.5px; 			 " 			></li> 		 </button>`;
+		}
+
+		let myPrizeCards = `<div style="position: absolute; bottom: 100%; left: 0; z-index: 10"> 			 <ul 				style=" 				 padding: 0; 				 margin: 0 auto; 				 display: table; 				 text-align: center; 				 width: auto; 				" 			 > 	${myPrize12CardsHtml}		 </ul> 			 <ul 				style=" 				 padding: 0; 				 margin: 0 auto; 				 display: table; 				 text-align: center; 				 width: auto; 				" 			 > 		${myPrize34CardsHtml} </ul> 			 <ul 				style=" 				 padding: 0; 				 margin: 0 auto; 				 display: table; 				 text-align: center; 				 width: auto; 				" 			 > 		${myPrize56CardsHtml} </ul> 			</div>`;
 
 		let myExceptActiveEnd = `</div>`;
 		let mySideEnd = `</div>`;
@@ -451,7 +525,7 @@ export class BattlePage extends HtmlPageBase {
 				case "debuglogstab":
 					{
 						html += `<br><div style="background:#36454F;border:2px solid white;color:white;padding:10px;><h4 style="color:green;"> Debug Logs: </h4> <br><br>`;
-						this.logs.forEach((log) => {
+						this.logs.reverse().forEach((log) => {
 							let color = "#20d420";
 							if (log.includes("|all|")) color = "yellow";
 							html += `<span style="color:${color}">${log}</span> <br>`;
@@ -474,17 +548,39 @@ export class BattlePage extends HtmlPageBase {
 								case "pokemon":
 									{
 										html += `<div style="margin:10px;padding:5px;border:1px solid white;">`;
-										if(card.subtypes.includes("Basic")){
+										if (card.subtypes.includes("Basic")) {
 											let activeCmd = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}battlepage, ${this.battleid}, action, chooseactive, ${card.ID}`;
-											;
-											if(!this.board?.me?.active?.length) html += `<button name="send" value="${activeCmd}" style="padding:5px;margin:10px;position: absolute ;right: 20px"> Choose Active </button> <br>`
-											if(this.board?.me?.active?.length && this.board?.me?.bench?.length < 5 ) html += `<button style="padding:5px;margin:10px;position: absolute ;right: 20px"> Add To Bench </button> <br>`
+											let benchCmd = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}battlepage, ${this.battleid}, action, addtobench, ${card.ID}`;
+
+											if (!this.board?.me?.active)
+												html += `<button name="send" value="${activeCmd}" style="padding:5px;margin:10px;position: absolute ;right: 20px"> Choose Active </button> <br>`;
+											if (
+												this.board?.me?.active &&
+												this.board?.me?.bench?.length <
+													5 && this.canUseAction("bench")
+											)
+												html += `<button name="send" value="${benchCmd}" style="padding:5px;margin:10px;position: absolute ;right: 20px"> Add To Bench </button> <br>`;
 										} else if (card.evolvesFrom) {
-											this.board?.me?.bench?.forEach((id:string) => {
-												let c = this.decks.me.get(id.trim());
-												if(!c) throw new Error(`card does not exist ${id}`);
-												if(Tools.toId(c.evolvesTo) == Tools.toId(card.evolvesFrom)) html += `<button style="padding:5px;margin:10px;position: absolute ;right: 20px"> Evolve ${card.name} </button> <br>`
-											})
+											this.board?.me?.bench?.forEach(
+												(id: string) => {
+													let c = this.decks.me.get(
+														id.trim()
+													);
+													if (!c)
+														throw new Error(
+															`card does not exist ${id}`
+														);
+													if (
+														Tools.toId(
+															c.evolvesTo
+														) ==
+														Tools.toId(
+															card.evolvesFrom
+														)
+													)
+														html += `<button style="padding:5px;margin:10px;position: absolute ;right: 20px"> Evolve ${card.name} </button> <br>`;
+												}
+											);
 										}
 										html += `<b> Name : </b> ${card.name} | <b> HP : </b> ${card.hp} <br>`;
 										html += `<b> Stage : </b> ${card.subtypes.join(
@@ -638,20 +734,29 @@ export const commands: BaseCommandDefinitions = {
 						bpage.setViewCardInHand(targets[0]);
 					}
 					break;
-				
-				case "action": {
-					console.log(targets);
-					let action = targets[0].trim();
-					targets.shift();
-					switch(action) {
-						case "chooseactive": {
-							let id = targets[0].trim();
-							bpage.chooseActivePokemon(id);
+
+				case "action":
+					{
+						console.log(targets);
+						let action = targets[0].trim();
+						targets.shift();
+						switch (action) {
+							case "chooseactive":
+								{
+									let id = targets[0].trim();
+									bpage.chooseActivePokemon(id);
+								}
+								break;
+
+							case "addtobench":
+								{
+									let id = targets[0].trim();
+									bpage.addToBench(id);
+								}
+								break;
 						}
-						break;
 					}
-				}
-				break;
+					break;
 			}
 
 			bpage2.send();
