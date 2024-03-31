@@ -268,7 +268,7 @@ class Packs {
 			obtainedVia: via + " (" + Date() + ")"
 		};
 		
-		db[user.id].cards.push(card);
+		db[user.id].cards.push(c);
 		this.sortCollections(user.id);
 		this.updateDatabase("collection");
 	}
