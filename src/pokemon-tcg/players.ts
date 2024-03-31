@@ -1,6 +1,7 @@
 import path = require("path")
 import { User } from "../users"
 import * as fs from "fs"
+import { currency } from "./currency"
 
 export interface IPlayer {
     id:string
@@ -9,17 +10,21 @@ export interface IPlayer {
     decks:Array<string>
 }
 
-class Player implements IPlayer{
+class Player implements IPlayer {
     id:string
     name:string
     rating:Record<string,any>
     decks:Array<string>
+    items:Record<string,any>
+    currency:string;
 
-    constructor(user:User) {
+    constructor(user:User | Player) {
         this.id = user.id
         this.name = user.name
         this.rating = {}
         this.decks = []
+        this.items = (user as Player).items ? (user as Player).items : {}
+        this.currency = currency.get(this.id) ? currency.get(this.id) : "0";
     }
 
 }
@@ -63,7 +68,6 @@ class _Players {
         return this.get(user.id)
     }
 
-
     
     addDeck(user:string,id:string) {
         let player = this.players[user];
@@ -78,6 +82,15 @@ class _Players {
         let index = player.decks.indexOf(id);
         player.decks.splice(index,1);
         this.update()
+    }
+
+    updatePlayer(id:string) {
+        if(!id) return;
+        if(!this.players[id]) throw new Error("Not a player");
+        let newPlayer = new Player(Users.get(id) ? Users.get(id) as User : this.players[id]);
+        delete this.players[id];
+        this.players[id] = newPlayer;
+        this.update();
     }
 
     update() {

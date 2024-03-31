@@ -17,7 +17,6 @@ export const commands: BaseCommandDefinitions = {
                  //   this.say(target)
                  if (!user.hasRank(Rooms.get("tcgtabletop"), "+")) return this.say("Access denied.")
                     let opts = target.replace("add","").split(",");
-                    this.say(opts)
                     let type = opts[0].trim();
                     let name = opts[1]
                     let description = opts[2]

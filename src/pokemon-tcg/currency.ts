@@ -1,7 +1,7 @@
 import path = require("path");
 import { User } from "../users";
 import * as fs from "fs";
-
+import { Players } from "./players";
 import { Tools } from "../tools";
 let tools = new Tools();
 const rootFolder = path.resolve(__dirname, '..', '..',"..");
@@ -43,6 +43,7 @@ class Currency {
 		userdb = this.db[user.id];
 		userdb.total = (parseFloat(userdb.total) + amount).toFixed(2);
 		this.log(user, amount, by, reason);
+		Players.updatePlayer(user.id);
 		this.update();
 	}
 
@@ -66,9 +67,9 @@ class Currency {
 		);
 	}
 
-    get(user:User) {
-        if(!this.db[user.id]) return 0.00 + " " + this.name;
-        return this.db[user.id].total + " " + this.name;
+    get(user:User | string) {
+        if(!this.db[user.id ? user.id : user]) return 0.00 + " " + this.name;
+        return this.db[user.id ? user.id : user].total + " " + this.name;
     }
 
 	update() {

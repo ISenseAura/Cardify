@@ -13,6 +13,7 @@ import type {
 } from "./types/command-parser";
 import type { User } from "./users";
 import { ActivityPageBase } from './html-pages/activity-pages/activity-page-base';
+import { IBaseMinigame } from './pokemon-tcg/minigames/base-minigame';
 
 interface IGameHtmlPages {
 	cardMatching: typeof CardMatchingPage;
@@ -133,6 +134,7 @@ export class CommandParser {
 	private activityHtmlPages: Dict<Map<Player, ActivityPageBase>> = {};
 	private commandGuides: Dict<Dict<ICommandGuide>> = {};
 	private commandModules: ICommandFile[] = [];
+	private minigameModules: Dict<any>;
 	private htmlPages: Dict<Dict<HtmlPageBase>> = {};
 	private htmlPageModules: Dict<IHtmlPageFile> = {};
 	private htmlPagesDir: string = path.join(Tools.srcBuildFolder, 'html-pages');
@@ -146,11 +148,18 @@ export class CommandParser {
 	private commandsDir: string;
 	private privateCommandsDir: string;
 	private privateHtmlPagesDir: string;
+	private minigamesDir:string;
 
 	constructor() {
 		this.commandsDir = path.join(Tools.srcBuildFolder, 'commands');
 		this.privateCommandsDir = path.join(this.commandsDir, 'private');
 		this.privateHtmlPagesDir = path.join(this.htmlPagesDir, 'private');
+		this.minigamesDir = path.join(
+			Tools.srcBuildFolder,
+			"pokemon-tcg/minigames"
+		);
+
+		this.minigameModules = {};
 	}
 
 	getGameHtmlPages(): IGameHtmlPages {
@@ -199,6 +208,8 @@ export class CommandParser {
 
 		this.loadHtmlPagesDirectory(this.htmlPagesDir, baseCommands);
 		this.loadHtmlPagesDirectory(this.privateHtmlPagesDir, baseCommands, true);
+
+		this.loadMinigamesDirectory(this.minigamesDir, baseCommands);
 
 		global.Commands = this.loadCommandDefinitions(baseCommands);
 		global.BaseCommands = Tools.deepClone(global.Commands);
@@ -484,7 +495,42 @@ export class CommandParser {
 			}
 		}
 	}
+
+	private loadMinigamesDirectory(directory: string, allCommands: BaseCommandDefinitions, privateDirectory?: boolean): void {
+		let mingameFiles: string[] = [];
+		try {
+			mingameFiles = fs.readdirSync(directory);
+		} catch (e) {
+			if ((e as NodeJS.ErrnoException).code === 'ENOENT' && privateDirectory) return;
+			throw e;
+		}
+
+		for (const fileName of mingameFiles) {
+			if (!fileName.endsWith('.js') || fileName === 'base-minigame.js') continue;
+			const minigamePath = path.join(directory, fileName);
+
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			const minigame = require(minigamePath) ;
+			this.minigameModules[Tools.toId(minigame.name)] = {};
+			this.minigameModules[Tools.toId(minigame.name)].description =
+			minigame.description;
+			this.minigameModules[Tools.toId(minigame.name)].name = minigame.name;
+			this.minigameModules[Tools.toId(minigame.name)].path =
+				this.minigamesDir + "/" + fileName;
+
+			if (minigame.commands) {
+				for (const i in minigame.commands) {
+					if (i in allCommands) {
+						throw new Error(`Minigame command ${i} is defined in more than one file`);
+					}
+				}
+
+				Object.assign(allCommands, minigame.commands);
+			}
+		}
+	}
 }
+
 
 export const instantiate = (): void => {
 	let oldCommandParser = global.CommandParser as CommandParser | undefined;

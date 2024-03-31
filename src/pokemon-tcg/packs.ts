@@ -259,7 +259,15 @@ class Packs {
 		if (!db[user.id]) {
 			db[user.id] = { cards: [], packsOpened: [] };
 		}
-		card.obtainedVia = via + " (" + Date() + ")";
+		let c = {
+			id: card.id,
+			name: card.name,
+			image: card.images.small,
+			large: card.images.large,
+			rarity: card.rarity,
+			obtainedVia: via + " (" + Date() + ")"
+		};
+		
 		db[user.id].cards.push(card);
 		this.sortCollections(user.id);
 		this.updateDatabase("collection");

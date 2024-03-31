@@ -33,20 +33,22 @@ const collectionPageCommand = "collectionpage";
 const chooseDeckShop = "choosedeckshop";
 const choosePackShop = "choosepackshop";
 const chooseFreeShop = "choosefreeshop";
+const chooseMiscShop = "choosemiscshop";
+
 const buyItem = "buyitem";
 
 // Deck commands
 
 const importDeckInputCommand = "importdeck";
 const searchUserForChallengeCommand = "searchuser";
-const deleteDeck = "deletedeck"
+const deleteDeck = "deletedeck";
 
 // Play commands
 const chooseDeckForBattle = "choosedeckforbattle";
 const chooseFormatForBattle = "chooseformatforbattle";
 const chooseFriendlyBattle = "choosefriendlybattle";
 const chooseRankBattle = "chooserankbattle";
-const challengeUserCmd = "challengeuser"
+const challengeUserCmd = "challengeuser";
 
 export const pageId = "tcg-manager";
 export const pages: Dict<TCGManager> = {};
@@ -66,7 +68,7 @@ export class TCGManager extends HtmlPageBase {
 
 	erroMsg: string | boolean;
 
-	currentShopView: "deck" | "pack" | "free";
+	currentShopView: "deck" | "pack" | "free" | "misc";
 
 	importDeckInput: TextInput<string>;
 	importDeckNameInput: TextInput<string>;
@@ -76,7 +78,7 @@ export class TCGManager extends HtmlPageBase {
 	selectedFormat: string;
 	selectedDeck: string;
 	challengeTo: string;
-	isChallenging:boolean;
+	isChallenging: boolean;
 	searchUserForChallenge: TextInput<string>;
 
 	constructor(room: Room, user: User) {
@@ -292,6 +294,11 @@ export class TCGManager extends HtmlPageBase {
 		this.send();
 	}
 
+	chooseMiscShop() {
+		this.currentShopView = "misc";
+		this.send();
+	}
+
 	buyItem(user: User, name: string, type: string) {
 		shop.buyItem(user, name, type);
 		this.send();
@@ -329,9 +336,9 @@ export class TCGManager extends HtmlPageBase {
 		this.clearImportDeckInput();
 	}
 
-	deleteDeck(id:string) {
+	deleteDeck(id: string) {
 		Decks.delete(id.trim());
-		console.log("test")
+		console.log("test");
 		this.send();
 	}
 
@@ -347,27 +354,29 @@ export class TCGManager extends HtmlPageBase {
 		this.send();
 	}
 
-	chooseDeckForBattle(id:string) {
-		if(!Decks.get(id)) throw new Error("Deck does not exist in DB : " + id);
+	chooseDeckForBattle(id: string) {
+		if (!Decks.get(id))
+			throw new Error("Deck does not exist in DB : " + id);
 		this.selectedDeck = id;
-		this.send()
+		this.send();
 	}
 
-	chooseFormatForBattle(id:string) {
+	chooseFormatForBattle(id: string) {
 		//if(!Decks.get(id)) throw new Error("Deck does not exist in DB : " + id);
 		this.selectedFormat = id;
 		this.send();
 	}
 
 	setUserForChallenge(input: string) {
-
-		if(input.trim() == "cancel") {
-
-			Battles.cancelChallenge(Users.get(this.userId),Users.get(this.challengeTo));
+		if (input.trim() == "cancel") {
+			Battles.cancelChallenge(
+				Users.get(this.userId),
+				Users.get(this.challengeTo)
+			);
 
 			this.challengeTo = "";
 			this.selectedDeck = "";
-			this.selectedFormat = ""
+			this.selectedFormat = "";
 			this.isChallenging = false;
 
 			this.send();
@@ -377,9 +386,9 @@ export class TCGManager extends HtmlPageBase {
 		if (input.trim() == "") {
 			this.challengeTo = Tools.toId(input);
 			this.selectedDeck = "";
-			this.selectedFormat = ""
+			this.selectedFormat = "";
 			this.isChallenging = false;
-		
+
 			this.send();
 			return;
 		}
@@ -395,9 +404,9 @@ export class TCGManager extends HtmlPageBase {
 		this.send();
 	}
 
-	rejectChallenge(to:string) {
+	rejectChallenge(to: string) {
 		this.erroMsg = "Challenge was rejected";
-		this.setUserForChallenge("")
+		this.setUserForChallenge("");
 	}
 
 	challengeUser() {
@@ -405,13 +414,18 @@ export class TCGManager extends HtmlPageBase {
 		let to = Users.get(this.challengeTo);
 		//console.log(to);
 		try {
-		let a = Battles.challenge(from,to,this.selectedFormat,this.selectedDeck,pages[from.id]);
-		if(a) {
-			this.isChallenging =  true;
-			this.send();
-		}
-		}
-		catch(e) {
+			let a = Battles.challenge(
+				from,
+				to,
+				this.selectedFormat,
+				this.selectedDeck,
+				pages[from.id]
+			);
+			if (a) {
+				this.isChallenging = true;
+				this.send();
+			}
+		} catch (e) {
 			this.erroMsg = e.message;
 			this.send();
 		}
@@ -504,11 +518,11 @@ export class TCGManager extends HtmlPageBase {
 					let player = Players.get(this.userId);
 					html += ``;
 					html += `<br><strong style='font-size:16px;'>Import Deck </strong> <br><br>`;
-					html += `<b> Notes : </b>  <br>`
-					html += `<ol> <li> The set name field does not work for now </li> <li> Use <a href="https://pokemoncard.io/deckbuilder/">pokemoncard.io</a> to build deck</li>`
-					html += `<li>Use the export deck feature of the same website and create a <a href="https://pastebin.com/">Pastebin</a> link.</li>`
-					html += `<li> Paste the link in the "Add pastebin link" input below and press submit </li>`
-					html += `<li> Example Link : <a href="https://pastebin.com/3ifjpQFf"> https://pastebin.com/3ifjpQFf </a> </li> </ol>`
+					html += `<b> Notes : </b>  <br>`;
+					html += `<ol> <li> The set name field does not work for now </li> <li> Use <a href="https://pokemoncard.io/deckbuilder/">pokemoncard.io</a> to build deck</li>`;
+					html += `<li>Use the export deck feature of the same website and create a <a href="https://pastebin.com/">Pastebin</a> link.</li>`;
+					html += `<li> Paste the link in the "Add pastebin link" input below and press submit </li>`;
+					html += `<li> Example Link : <a href="https://pastebin.com/3ifjpQFf"> https://pastebin.com/3ifjpQFf </a> </li> </ol>`;
 					html += `<div style='margin-left:10px;'>`;
 					html += `</div>`;
 					html += this.deckImportingStatus
@@ -531,7 +545,7 @@ export class TCGManager extends HtmlPageBase {
 							} and more! </i>`;
 							let onClick = `name="send" value="/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}viewdeck, view, ${d}"`;
 							let deleteDeckCommand = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${this.commandPrefix}, deletedeck, ${d}`;
-							
+
 							html += `<button name="send" value="${deleteDeckCommand}"> Delete </button> <br><button ${onClick} style="background: #282a45; color: inherit; border: 1px solid white; padding: 0; font: inherit; cursor: pointer; border-radius: 10px; outline: inherit; width: 100%; overflow: hidden; position: relative; color: white; font-family: Arial, sans-serif; margin: 2px 0; " > <div style=" background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3jLYNLuYwPs1suOGNkzsJpLZ-KgNeyLWF_g&usqp=CAU') center/cover no-repeat; filter: blur(1px); position: relative; text-align: center; height: 60px; transform: rotate(3deg); transform: scale(1.1); " > <div style=" position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(40, 42, 69, 0.6); " ></div> </div> <div style=" position: absolute; top: 0; left: 0; z-index: 10; text-align: left; padding: 15px; " > <p style="color: white; margin: 0; font-weight: 700; font-size: 16px"> ${title} </p> <p style=" color: #c9c9c9; margin: 0; background: none; font-weight: 500; font-size: 12px; " > ${subtitle} </p>  </div></button><br>`;
 						});
 					}
@@ -568,6 +582,7 @@ export class TCGManager extends HtmlPageBase {
 					let deckView = this.currentShopView == "deck";
 					let packView = this.currentShopView == "pack";
 					let freeView = this.currentShopView == "free";
+					let miscView = this.currentShopView == "misc";
 
 					html +=
 						"&nbsp;" +
@@ -591,6 +606,14 @@ export class TCGManager extends HtmlPageBase {
 							this.commandPrefix + ", " + chooseFreeShop,
 							"Free Items",
 							{ selectedAndDisabled: freeView }
+						);
+
+					html +=
+						"&nbsp;" +
+						this.getQuietPmButton(
+							this.commandPrefix + ", " + chooseMiscShop,
+							"Misc",
+							{ selectedAndDisabled: miscView }
 						);
 
 					html += `<br><div style=" border:1px solid skyblue; padding:6px; background-color: #282a45; color: white; font-family: Arial, sans-serif; padding: 2px 0; text-align: left; " >`;
@@ -627,6 +650,31 @@ export class TCGManager extends HtmlPageBase {
 													"Claim"
 											  ) + "</td></tr>"
 											: "Claimed");
+								});
+							}
+							break;
+
+						case "misc":
+							{
+								let items = shop.misc;
+								let keys = Object.keys(items);
+								keys.forEach((key) => {
+									let item = items[key];
+
+									html += `<tr><td> ${item.name} </td> <td> ${item.description} </td> <td> ${item.price} </td>`;
+									html +=
+										"<td>" +
+										this.getQuietPmButton(
+											this.commandPrefix +
+												", " +
+												buyItem +
+												"," +
+												item.name +
+												"|" +
+												item.type,
+											"Buy"
+										) +
+										"</td></tr>";
 								});
 							}
 							break;
@@ -686,21 +734,20 @@ export class TCGManager extends HtmlPageBase {
 					switch (this.currentPlayView) {
 						case "friendlybattleview":
 							{
-								if(this.isChallenging) {
-									html += `<br><h3> You are challenging <span class="username"> ${this.challengeTo} </span>!`
+								if (this.isChallenging) {
+									html += `<br><h3> You are challenging <span class="username"> ${this.challengeTo} </span>!`;
 									html +=
-									"&nbsp;&nbsp;" +
-									this.getQuietPmButton(
-										this.commandPrefix +
-											", " +
-											searchUserForChallengeCommand +
-											"," +
-											"cancel",
-										"Cancel"
-									);
-									html += `<br> What happens next will be implemented in a couple of days :D </h3>`
-								}
-								else if (!this.challengeTo.length) {
+										"&nbsp;&nbsp;" +
+										this.getQuietPmButton(
+											this.commandPrefix +
+												", " +
+												searchUserForChallengeCommand +
+												"," +
+												"cancel",
+											"Cancel"
+										);
+									html += `<br> What happens next will be implemented in a couple of days :D </h3>`;
+								} else if (!this.challengeTo.length) {
 									html += `<h3> Who do you wanna play with? </h3> `;
 									html +=
 										this.searchUserForChallenge.render();
@@ -771,8 +818,13 @@ export class TCGManager extends HtmlPageBase {
 									if (player.decks.length > 10)
 										html += `</details>`;
 
-										let challengeCmd = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}tcg, ${challengeUserCmd},${this.selectedFormat},${this.selectedDeck}`;
-									html += `<button class="button mainmenu1" name="send" value="${challengeCmd}" style="font-size:19px;padding:11px;position:absolute;top:320px;right:40px;text-shadow: 0 -1px 0 #0f1924;" ${(this.selectedDeck.length > 1 && this.selectedFormat.length > 1) ? "" : "disabled" }> Challenge! </button>`;
+									let challengeCmd = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}tcg, ${challengeUserCmd},${this.selectedFormat},${this.selectedDeck}`;
+									html += `<button class="button mainmenu1" name="send" value="${challengeCmd}" style="font-size:19px;padding:11px;position:absolute;top:320px;right:40px;text-shadow: 0 -1px 0 #0f1924;" ${
+										this.selectedDeck.length > 1 &&
+										this.selectedFormat.length > 1
+											? ""
+											: "disabled"
+									}> Challenge! </button>`;
 								}
 							}
 							break;
@@ -821,7 +873,7 @@ export const commands: BaseCommandDefinitions = {
 			if (!(user.id in pages) && cmd !== CLOSE_COMMAND)
 				new TCGManager(botRoom, user);
 
-				console.log(cmd + "-" + targets)
+			console.log(cmd + "-" + targets);
 			if (cmd === chooseIntro) {
 				pages[user.id].chooseIntro();
 			} else if (cmd === chooseCollection) {
@@ -840,21 +892,23 @@ export const commands: BaseCommandDefinitions = {
 				pages[user.id].choosePackShop();
 			} else if (cmd === chooseFreeShop) {
 				pages[user.id].chooseFreeShop();
+			}else if (cmd === chooseMiscShop) {
+				pages[user.id].chooseMiscShop();
 			} else if (cmd === chooseFriendlyBattle) {
 				pages[user.id].chooseFriendlyBattle();
 			} else if (cmd === chooseRankBattle) {
 				pages[user.id].chooseRankBattle();
-			}else if (cmd === chooseDeckForBattle) {
+			} else if (cmd === chooseDeckForBattle) {
 				pages[user.id].chooseDeckForBattle(targets[0].trim());
-			}else if (cmd === deleteDeck) {
+			} else if (cmd === deleteDeck) {
 				pages[user.id].deleteDeck(targets[0].trim());
-			}else if (cmd === chooseFormatForBattle) {
-				console.log(cmd + "|" + targets)
+			} else if (cmd === chooseFormatForBattle) {
+				console.log(cmd + "|" + targets);
 				pages[user.id].chooseFormatForBattle(targets[0].trim());
-			}else if (cmd === challengeUserCmd) {
-				console.log(cmd + "|" + targets)
+			} else if (cmd === challengeUserCmd) {
+				console.log(cmd + "|" + targets);
 				pages[user.id].challengeUser();
-			}else if (cmd === "rejectchallenge") {
+			} else if (cmd === "rejectchallenge") {
 				pages[user.id].rejectChallenge(targets[0].trim());
 			} else if (cmd === buyItem) {
 				let opts = targets[0].trim().split("|");
@@ -869,10 +923,10 @@ export const commands: BaseCommandDefinitions = {
 				)
 					return pages[user.id].setUserForChallenge("");
 				if (
-						cmd == searchUserForChallengeCommand &&
-						targets[0].trim() == "cancel"
-					)
-						return pages[user.id].setUserForChallenge("cancel");
+					cmd == searchUserForChallengeCommand &&
+					targets[0].trim() == "cancel"
+				)
+					return pages[user.id].setUserForChallenge("cancel");
 				const error = pages[user.id].checkComponentCommands(
 					cmd,
 					targets

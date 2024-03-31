@@ -1,12 +1,18 @@
+import fs = require("fs");
+import type { BaseCommandDefinitions } from "../../types/command-parser";
 import { Room } from "../../rooms";
 import { User } from "../../users";
-import { IMinigame, Minigame } from "../minigames";
+import { IBaseMinigame, Minigame } from "./base-minigame";
 
 import pokemon from "pokemontcgsdk";
 import { packs } from "../packs";
 
 
-class game extends Minigame {
+export const name = "Guess The Card";
+export const description =
+	"A Quick Minigame in which you are shown a part of a card and you have guess it's correct name.";
+
+export class Game extends Minigame {
 	guessesRemaining: number;
 	lastGuess: string;
 	lastGuessBy: string;
@@ -17,11 +23,8 @@ class game extends Minigame {
 
 	id: string;
 
-	static name: string;
-	static description: string;
-
 	constructor(room: Room, user: User, timer?: number) {
-		let data: IMinigame = {
+		let data: IBaseMinigame = {
 			name: name,
 			official: false,
 			textBased: false,
@@ -40,9 +43,8 @@ class game extends Minigame {
 					this._end("Times Up!");
 			  }, timer * 1000)
 			: null;
-		name = "Guess The Card";
-		description =
-			"A Quick Minigame in which you are shown a part of a card and you have guess it's correct name.";
+
+		this.gameStart();
 	}
 
 	gameStart() {
@@ -83,6 +85,7 @@ class game extends Minigame {
 				card.images.small
 			}') center/contain no-repeat; height: 200px; width: 150px; display: inline-block; margin: 0 1px; "> </div> </div> <div style="width: 45%; margin: auto 5px auto 5px; font-size: 13px; line-height: 17px; padding: 8px; vertical-align: middle; overflow: hidden;"> <h2 style="vertical-align: middle; font-style: italic; line-height: 1.2em;color:red;"> No one could guess the right answer! </h2> <br> <span> Guesses remaining : ${"0"}</span></div> </div>`;
 			room.sayUhtml("burnthecard" + gameCount, html);
+			this._end();
 		} else {
 			this.guessesRemaining = this.guessesRemaining - 1;
 			this.lastGuess = user.name + " - " + target;
@@ -99,5 +102,38 @@ class game extends Minigame {
 	}
 }
 
+export const commands: BaseCommandDefinitions = {
 
-export default game;
+	guessthecard: {
+		command(target, room, user) {
+			if (!user.hasRank(room, "+")) return room.sayPrivateHtml(
+				user,
+				"<b style='color:red;'> Access Denied </b> Only roomauth can use this command"
+			);
+
+			try{
+				global.Minigames.createNew(Tools.toId(name), room, user)
+			}
+			catch(e) {
+				this.say(e.message);
+			}
+		},
+		aliases:["newgtc"],
+	},
+
+	guesscard: {
+		command(target, room, user) {
+			let game = Minigames.activeGames[room.id];
+			if (!game || game?.ended)
+				return room.say(
+					"There is no minigame running in the room."
+				);
+			let guess = Tools.toId(target);
+			if (!game.answer.length) return;
+			game.guess(guess, user);
+		},
+		aliases: ["gc"],
+		syntax: ["[expression]"],
+		description: ["evaluates the given expression and displays the result"],
+	},
+};

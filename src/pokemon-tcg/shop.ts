@@ -6,7 +6,7 @@ import { Path } from "typescript";
 import { packs } from "./packs";
 import { Room } from "../rooms";
 
-export type ItemType = "pack" | "deck" | "free";
+export type ItemType = "pack" | "deck" | "free" | "misc";
 
 export class ShopItem {
 	name: string;
@@ -62,6 +62,7 @@ class Shop {
 	 decks: Record<string, ShopItem>;
 	 packs: Record<string, ShopItem>;
 	 free: Record<string, ShopItem>;
+	 misc: Record<string,ShopItem>;
 
 	room: Room | undefined;
 
@@ -82,11 +83,13 @@ class Shop {
 		if (!fs.existsSync(this.dir + "/shop.json"))
 			fs.writeFileSync(
 				this.dir + "/shop.json",
-				JSON.stringify({ decks: {}, packs: {}, free: {} })
+				JSON.stringify({ decks: {}, packs: {}, free: {}, misc:{} })
 			);
 		this.decks = JSON.parse(fs.readFileSync(this.db).toString()).decks;
 		this.packs = JSON.parse(fs.readFileSync(this.db).toString()).packs;
 		this.free = JSON.parse(fs.readFileSync(this.db).toString()).free;
+		this.misc = JSON.parse(fs.readFileSync(this.db).toString()).misc ? JSON.parse(fs.readFileSync(this.db).toString()).misc : {};
+
 
 		this.room = Rooms.get("tcgtabletop");
 	}
@@ -147,6 +150,21 @@ class Shop {
 				}
 
 				break;
+
+				case "misc":
+					{
+						if (this.misc[id]) return "Cannot add duplicate item";
+						item = new ShopItem(name, type, price, user.id);
+
+						item.setDescription(description)
+	
+						this.misc[id] = item;
+	
+						this.updateDB();
+						return "Successfully added free item : " + name;
+					}
+	
+					break;
 
 			default:
 				return "Invalid item type (Valid types : deck, pack, free)";
