@@ -3,6 +3,9 @@ import { User } from "../users"
 import * as fs from "fs"
 import { currency } from "./currency"
 
+import { Tools } from "../tools";
+let tools = new Tools();
+
 export interface IPlayer {
     id:string
     name:string
@@ -36,7 +39,7 @@ class _Players {
 
     constructor() {
         
-		this.dir = path.join(Tools.rootFolder, "databases") + "/players.json";
+		this.dir = path.join(tools.rootFolder, "databases") + "/players.json";
 
 		if (!fs.existsSync(this.dir))
 			fs.writeFileSync(
@@ -47,7 +50,7 @@ class _Players {
     }
 
     has(id:string):boolean {
-        if(this.players[Tools.toId(id)]) return true;
+        if(this.players[tools.toId(id)]) return true;
         return false;
     }
 
@@ -86,7 +89,7 @@ class _Players {
 
     updatePlayer(id:string) {
         if(!id) return;
-        if(!this.players[id]) throw new Error("Not a player");
+        if(!this.players[id]) return console.log("Not a player");
         let newPlayer = new Player(Users.get(id) ? Users.get(id) as User : this.players[id]);
         delete this.players[id];
         this.players[id] = newPlayer;
