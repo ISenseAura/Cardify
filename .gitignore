@@ -82,7 +82,6 @@ roomlogs/
 build/
 client-data/pokedex-mini.js
 client-data/pokedex-mini-bw.js
-databases/*.json
 !databases/README.md
 databases/archives/*.json
 !databases/archives/README.md
