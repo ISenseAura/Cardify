@@ -82,11 +82,11 @@ export const rewritePokemonShowdownPackageJson = (): void => {
 };
 
 export const buildPokemonShowdown = (): string | false => {
-	console.log("Running pokemon-showdown build script...");
+	//console.log("Running pokemon-showdown build script...");
 
-	deleteFolderRecursive(getPokemonShowdownDistFolder());
+	//deleteFolderRecursive(getPokemonShowdownDistFolder());
 
-	return exec('node build');
+	//return exec('node build');
 };
 
 export const buildSrc = async(options?: RunOptions): Promise<void> => {
