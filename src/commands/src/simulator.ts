@@ -38,16 +38,12 @@ export class Simulator extends ObjectReadWriteStream<string>{
     switch (type) {
       case "start":
         {
-          console.log("test 1");
           if (!message)
             return this.inputError(
               "'start' protocol received invalid or missing argument (Expected a JSON)"
             );
 
-            console.log(message.slice(0,300))
-            // console.log(message)
           let data: StartData = JSON.parse(message);
-          console.log("test 3")
 
           if (!data.p1 || !data.p2)
             return this.inputError("Please provide both players detail");

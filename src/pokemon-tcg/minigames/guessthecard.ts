@@ -10,7 +10,7 @@ import { packs } from "../packs";
 
 export const name = "Guess The Card";
 export const description =
-	"A Quick Minigame in which you are shown a part of a card and you have guess it's correct name.";
+	"A Quick Minigame in which you are shown a part of a card and you have to guess it's correct name.";
 
 export class Game extends Minigame {
 	guessesRemaining: number;

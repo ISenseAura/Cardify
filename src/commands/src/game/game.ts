@@ -43,7 +43,7 @@ interface Field {
   stadium: Record<string, { side: PlayerID; id: string; isActive: boolean }>;
 }
 
-export  class Game extends EventEmitter implements GameEvents {
+export class Game extends EventEmitter implements GameEvents {
   readonly ID: string;
   readonly created: Date;
   public initPlayers: Array<{
@@ -153,19 +153,21 @@ export  class Game extends EventEmitter implements GameEvents {
 
     this.emit("initiated", this.getUpdate({deck:true}));
 
-    this.send("The Game has started!");
+    this.send("Starting your preparations!");
 
     this.send("Shuffling your deck", "p1");
     this.p1.deck.shuffle(true);
     this.send("Drawing 7 cards", "p1");
     this.drawMultipleCards("p1", 7);
+    this.updatePlayer("p1");
 
     this.send("Shuffling your deck", "p2");
     this.p2.deck.shuffle(true);
     this.send("Drawing 7 cards", "p2");
     this.drawMultipleCards("p2", 7);
+    this.updatePlayer("p2");
 
-    this.updatePlayer();
+ 
     this.performBeforeGameStartChecks();
   }
 
@@ -286,7 +288,7 @@ export  class Game extends EventEmitter implements GameEvents {
       this.sendSideUpdate(player);
       this.askForChoices(player, ["bench", "ready"]);
     } catch (e: any) {
-      throw new Error(e.message);
+      throw new Error(e);
     }
   }
 
@@ -486,7 +488,7 @@ export  class Game extends EventEmitter implements GameEvents {
           msg: "You dont have basic cards, re-drawing hand",
         });
         this.send(`Player ${p2.userid} draws one more card as per rules`);
-        this.drawSingleCard("p2");
+        this.drawSingleCard(p2.playerid);
         this.reDrawHand(id);
 
       } else {

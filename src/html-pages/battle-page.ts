@@ -118,7 +118,8 @@ export class BattlePage extends HtmlPageBase {
 		this.send();
 	}
 
-	/* @SIMULATOR-PROTOCOLS-SENDERS */
+	/* @SIMULATOR-PROTOCOLS-SENDERS 
+	   @SIMULATOR-IN-GAME-ACTION-HANDLERS */
 
 	chooseActivePokemon(id: string) {
 		let card = this.decks.me.get(id);
@@ -128,6 +129,11 @@ export class BattlePage extends HtmlPageBase {
 			);
 		this.sendProtocol(`activepokemon ${id}`);
 		this.viewCardInHand = null;
+
+		let readyCmd = `/msg cardify, /msgroom tcgtabletop, /botmsg cardify, ${Config.commandCharacter}battlepage, ${this.battleid}, action, ready`;
+		this.log(
+			`Click <button name="send" value="${readyCmd}"> Ready! </button> when you are done with preparations.`
+		);
 	}
 
 	addToBench(id: string) {
@@ -141,14 +147,23 @@ export class BattlePage extends HtmlPageBase {
 		this.viewCardInHand = null;
 	}
 
+	playerReady() {
+		if (!this.board.me.active)
+			throw new Error(
+				`Player cannot send ready protocol without having a active card ${this.playerid}`
+			);
+		this.sendProtocol("ready");
+	}
+
 	updateAvailableChoices(choices: Array<string> | string, data?: any) {
-		if(Array.isArray(choices)) this.performableActions = choices;
-		if(typeof choices == typeof "" && !choices.includes(",")) this.performableActions.push(choices as string);
+		if (Array.isArray(choices)) this.performableActions = choices;
+		if (typeof choices == typeof "" && !choices.includes(","))
+			this.performableActions.push(choices as string);
 		this.send();
 	}
 
-	canUseAction(action:string) {
-		if(this.performableActions.includes(action)) return true;
+	canUseAction(action: string) {
+		if (this.performableActions.includes(action)) return true;
 		return false;
 	}
 
@@ -156,6 +171,11 @@ export class BattlePage extends HtmlPageBase {
 		let battle = Battles.battles[this.battleid];
 		if (!battle) throw new Error(`Battle does not exist ${this.battleid}`);
 		battle.stream._writeLines(`>${this.playerid} ${line.trim()}`);
+		this.log(
+			`<span style="color:skyblue;"> >>>${
+				this.playerid
+			} ${line.trim()} </span>`
+		);
 		this.send();
 	}
 
@@ -163,7 +183,7 @@ export class BattlePage extends HtmlPageBase {
 
 	log(line: string) {
 		console.log(`[BP-Log] ${line}`);
-		if (!line.includes("|")) {
+		if (!line.includes("|") && !line.trim().startsWith("<span")) {
 			this.customMessages.push(line);
 			this.send();
 			return;
@@ -320,8 +340,6 @@ export class BattlePage extends HtmlPageBase {
 
 		let myDiscardPile = `<div style="position: absolute; top: -50%; right: 0"> 			 <button 				id="discard-pile" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<div 				 style=" 					background: url('https://archives.bulbagarden.net/media/upload/1/17/Cardback.jpg') 					 center/contain no-repeat; 					height: 4vw; 					width: 3vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 40px; 					max-width: 30px; 					min-height: 25px; 					min-width: 18.75px; 				 " 				> ${this.board.opponent.discardPile}</div> 			 </button> 			</div>`;
 
-
-
 		let myBenchCardsHtml = ``;
 
 		for (let i = 0; i < 5; i++) {
@@ -332,7 +350,6 @@ export class BattlePage extends HtmlPageBase {
 
 			myBenchCardsHtml += `	 <button 				id="opponent-bench-1" 				style=" 				 background: none; 				 color: inherit; 				 border: none; 				 padding: 0; 				 font: inherit; 				 cursor: pointer; 				 outline: inherit; 				" 			 > 				<li 				 style=" 					background: url('${link}') 					 center/contain no-repeat; 					height: 10vw; 					width: 7.5vw; 					display: inline-block; 					margin: 0 1px; 					max-height: 50px; 					max-width: 37.5px; 				 " 				></li> 			 </button>`;
 		}
-
 
 		let myBenchCards = `<ul 			 style=" 				padding: 0; 				margin: 0 auto; 				display: table; 				text-align: center; 				width: auto; 			 " 			> 		${myBenchCardsHtml} </ul>`;
 
@@ -557,7 +574,8 @@ export class BattlePage extends HtmlPageBase {
 											if (
 												this.board?.me?.active &&
 												this.board?.me?.bench?.length <
-													5 && this.canUseAction("bench")
+													5 &&
+												this.canUseAction("bench")
 											)
 												html += `<button name="send" value="${benchCmd}" style="padding:5px;margin:10px;position: absolute ;right: 20px"> Add To Bench </button> <br>`;
 										} else if (card.evolvesFrom) {
@@ -752,6 +770,12 @@ export const commands: BaseCommandDefinitions = {
 								{
 									let id = targets[0].trim();
 									bpage.addToBench(id);
+								}
+								break;
+
+							case "ready":
+								{
+									bpage.playerReady();
 								}
 								break;
 						}

@@ -419,7 +419,7 @@ export class Deck {
 		console.log(totalCards);
 		if (totalCards !== 60)
 			throw new Error(
-				"[INVALID DECK] The deck must contain exact 60 cards"
+				"[INVALID DECK] The deck must contain exactly 60 cards"
 			);
 		return true;
 	}
