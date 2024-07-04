@@ -23,7 +23,7 @@ const rootFiles = fs.readdirSync(__dirname);
         sourcemap: true,
         tsconfig: tsConfig,
         outdir: rootBuildFolder,
-        buildConcurrency: 3
+        buildConcurrency: 2
     });
 
     if (result.errors.length) {
